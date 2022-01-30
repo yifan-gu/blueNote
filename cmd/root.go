@@ -9,8 +9,9 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/yifan-gu/klipingHtml2org/pkg/config"
-	"github.com/yifan-gu/klipingHtml2org/pkg/parser"
+	"github.com/yifan-gu/kliping2org/pkg/config"
+	"github.com/yifan-gu/kliping2org/pkg/db"
+	"github.com/yifan-gu/kliping2org/pkg/parser"
 )
 
 var (
@@ -19,7 +20,7 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "klipingHtml2org",
+	Use:   "kliping2org",
 	Short: "Convert Kindle exported clipping html(s) to org file(s)",
 	Run:   run,
 }
@@ -54,6 +55,7 @@ func init() {
 	rootCmd.PersistentFlags().BoolVarP(&cfg.SplitBook, "split", "s", false, "split sub-sections into separate books")
 	rootCmd.PersistentFlags().StringVarP(&cfg.RoamDir, "roam-dir", "r", config.DefaultRoamDir, "path to the org-roam directory")
 	rootCmd.PersistentFlags().StringVarP(&cfg.RoamDBPath, "roam-db-path", "d", config.DefaultRoamDBPath, "path to the org-roam sqlite3 database")
+	rootCmd.PersistentFlags().StringVar(&cfg.DBDriver, "db-driver", db.SqlDriverSqinn, "the database driver to use")
 	rootCmd.PersistentFlags().BoolVarP(&cfg.InsertRoamLink, "insert-roam-link", "l", true, "insert the roam links")
 	rootCmd.PersistentFlags().BoolVarP(&cfg.AuthorSubDir, "author-sub-dir", "a", true, "create sub-directory with the name of the author")
 }

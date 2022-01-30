@@ -18,7 +18,8 @@ import (
 	"github.com/google/uuid"
 	"golang.org/x/net/html"
 
-	"github.com/yifan-gu/klipingHtml2org/pkg/config"
+	"github.com/yifan-gu/kliping2org/pkg/config"
+	"github.com/yifan-gu/kliping2org/pkg/db"
 )
 
 // TODO: chapter data, sectionHeading (done)
@@ -28,17 +29,21 @@ import (
 // write to file (done)
 // parse multiple books (done)
 //
-// compute title
+// compute title (done)
 // iterate entries, figure out pos val (done)
 // insert database
+// cmdline argument first
+//
 // optional roam db
+// optional author dir
 // check roam version
 
-// default org roam dir
-//
+// default org roam dir (done)
+// type for note (no-op, because all treated as level 1 headlines, done)
 // ask for skip, replace all
-// optional author dir
-// cmdline argument first
+//
+// refactor book module, insert commit transaction
+//
 
 type MarkType int
 
@@ -71,19 +76,22 @@ type Mark struct {
 	Location *Location
 	Data     string
 	Pos      int
-}
-
-func (mk *Mark) UUID() uuid.UUID {
-	return uuid.New()
+	UUID     uuid.UUID
 }
 
 type Book struct {
 	Title  string
 	Author string
 	Marks  []*Mark
+	UUID   uuid.UUID
 }
 
-func (b *Book) FormatOrg() ([]byte, error) {
+func generateOutputPath(b *Book, cfg *config.Config) string {
+	filename := fmt.Sprintf("《%s》 by %s.org", b.Title, b.Author)
+	return filepath.Join(cfg.OutputDir, filename)
+}
+
+func (b *Book) FormatOrg(sp *SqlPlanner, cfg *config.Config) ([]byte, error) {
 	const orgTitleTpl = `:PROPERTIES:
 :ID:       {{ .UUID }}
 :END:
@@ -110,10 +118,20 @@ Section: {{ .Section }}
 	if err := titleT.Execute(buf, b); err != nil {
 		return nil, fmt.Errorf("failed to execute org template for title: %v", err)
 	}
+	b.UUID = uuid.New()
+
+	if err := sp.InsertNodeLinkTitleEntry(b, cfg.RoamDBPath, generateOutputPath(b, cfg)); err != nil {
+		return nil, err
+	}
 
 	for _, mk := range b.Marks {
-		// Move cursor to the whitespace after the "*"
+		mk.UUID = uuid.New()
 		mk.Pos = len([]rune(buf.String())) + len("\n*")
+
+		if err := sp.InsertNodeLinkMarkEntry(b, mk, cfg.RoamDBPath, generateOutputPath(b, cfg)); err != nil {
+			return nil, err
+		}
+
 		entryT := template.Must(template.New("template").Parse(orgEntryTpl))
 		if err := entryT.Execute(buf, mk); err != nil {
 			return nil, fmt.Errorf("failed to execute org template for entries: %v", err)
@@ -121,10 +139,6 @@ Section: {{ .Section }}
 	}
 
 	return buf.Bytes(), nil
-}
-
-func (b *Book) UUID() uuid.UUID {
-	return uuid.New()
 }
 
 func (b *Book) Split() []*Book {
@@ -341,6 +355,12 @@ func writeRunesToFile(fullpath string, runes []rune) error {
 func parseAndWrite(inputPath string, cfg *config.Config) error {
 	var books []*Book
 
+	sq, err := db.NewSqlInterface(cfg.RoamDBPath, cfg.DBDriver)
+	if err != nil {
+		return err
+	}
+	defer sq.Close()
+
 	book, err := parseBook(inputPath)
 	if err != nil {
 		return err
@@ -353,17 +373,19 @@ func parseAndWrite(inputPath string, cfg *config.Config) error {
 	}
 
 	for _, bk := range books {
-		b, err := bk.FormatOrg()
+		sp := NewSqlPlanner(sq)
+		b, err := bk.FormatOrg(sp, cfg)
 		if err != nil {
 			return err
 		}
 
-		filename := fmt.Sprintf("《%s》 by %s.org", bk.Title, bk.Author)
-		fullpath := filepath.Join(cfg.OutputDir, filename)
-
 		// To fix non-English encoding issue.
 		r := []rune(string(b))
+		fullpath := generateOutputPath(bk, cfg)
 		if err := writeRunesToFile(fullpath, r); err != nil {
+			return err
+		}
+		if err := sp.CommitSql(); err != nil {
 			return err
 		}
 	}
@@ -390,6 +412,7 @@ func ParseAndWrite(cfg *config.Config) error {
 		}); err != nil {
 			return err
 		}
+
 		return nil
 	}
 	return parseAndWrite(cfg.InputPath, cfg)

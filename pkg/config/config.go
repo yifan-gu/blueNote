@@ -10,6 +10,7 @@ import (
 	"os"
 
 	"github.com/spf13/viper"
+	"github.com/yifan-gu/kliping2org/pkg/db"
 )
 
 type Config struct {
@@ -18,6 +19,7 @@ type Config struct {
 	SplitBook      bool
 	RoamDir        string
 	RoamDBPath     string
+	DBDriver       string
 	InsertRoamLink bool
 	AuthorSubDir   bool
 }
@@ -32,6 +34,7 @@ func LoadConfig(cfgFile string, cfg *Config) error {
 	viper.SetDefault("SplitBook", false)
 	viper.SetDefault("RoamDir", DefaultRoamDir)
 	viper.SetDefault("RoamDBPath", DefaultRoamDBPath)
+	viper.SetDefault("DBDriver", db.SqlDriverSqinn)
 	viper.SetDefault("InsertRoamLink", true)
 	viper.SetDefault("AuthorSubDir", false)
 
@@ -48,6 +51,7 @@ func LoadConfig(cfgFile string, cfg *Config) error {
 	cfg.SplitBook = viper.GetBool("SplitBook")
 	cfg.RoamDir = viper.GetString("RoamDir")
 	cfg.RoamDBPath = viper.GetString("RoamDBPath")
+	cfg.DBDriver = viper.GetString("DBDriver")
 	cfg.InsertRoamLink = viper.GetBool("InsertRoamLink")
 	cfg.AuthorSubDir = viper.GetBool("AuthorSubDir")
 
