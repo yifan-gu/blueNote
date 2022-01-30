@@ -20,6 +20,7 @@ type Config struct {
 	RoamDir        string
 	RoamDBPath     string
 	DBDriver       string
+	Parser         string
 	InsertRoamLink bool
 	AuthorSubDir   bool
 }
@@ -27,6 +28,7 @@ type Config struct {
 const (
 	DefaultRoamDir    = "~/org/roam"
 	DefaultRoamDBPath = "~/.emacs.d/.local/etc/org-roam.db"
+	DefaultParser     = "htmlclipping"
 )
 
 func LoadConfig(cfgFile string, cfg *Config) error {
@@ -35,6 +37,7 @@ func LoadConfig(cfgFile string, cfg *Config) error {
 	viper.SetDefault("RoamDir", DefaultRoamDir)
 	viper.SetDefault("RoamDBPath", DefaultRoamDBPath)
 	viper.SetDefault("DBDriver", db.SqlDriverSqinn)
+	viper.SetDefault("Parser", DefaultParser)
 	viper.SetDefault("InsertRoamLink", true)
 	viper.SetDefault("AuthorSubDir", false)
 
@@ -52,6 +55,7 @@ func LoadConfig(cfgFile string, cfg *Config) error {
 	cfg.RoamDir = viper.GetString("RoamDir")
 	cfg.RoamDBPath = viper.GetString("RoamDBPath")
 	cfg.DBDriver = viper.GetString("DBDriver")
+	cfg.Parser = viper.GetString("Parser")
 	cfg.InsertRoamLink = viper.GetBool("InsertRoamLink")
 	cfg.AuthorSubDir = viper.GetBool("AuthorSubDir")
 
