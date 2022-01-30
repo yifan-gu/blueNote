@@ -10,7 +10,7 @@ import (
 	"os"
 
 	"github.com/spf13/viper"
-	"github.com/yifan-gu/kliping2org/pkg/db"
+	"github.com/yifan-gu/klipping2org/pkg/db"
 )
 
 type Config struct {

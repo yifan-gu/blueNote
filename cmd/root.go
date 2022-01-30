@@ -9,9 +9,9 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/yifan-gu/kliping2org/pkg/config"
-	"github.com/yifan-gu/kliping2org/pkg/db"
-	"github.com/yifan-gu/kliping2org/pkg/parser"
+	"github.com/yifan-gu/klipping2org/pkg/config"
+	"github.com/yifan-gu/klipping2org/pkg/db"
+	"github.com/yifan-gu/klipping2org/pkg/parser"
 )
 
 var (
@@ -20,7 +20,7 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "kliping2org",
+	Use:   "klipping2org",
 	Short: "Convert Kindle exported clipping html(s) to org file(s)",
 	Run:   run,
 }

@@ -1,4 +1,4 @@
-module github.com/yifan-gu/kliping2org
+module github.com/yifan-gu/klipping2org
 
 go 1.17
 

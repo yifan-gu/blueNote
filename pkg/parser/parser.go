@@ -15,8 +15,8 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/yifan-gu/kliping2org/pkg/config"
-	"github.com/yifan-gu/kliping2org/pkg/db"
+	"github.com/yifan-gu/klipping2org/pkg/config"
+	"github.com/yifan-gu/klipping2org/pkg/db"
 )
 
 // TODO: chapter data, sectionHeading (done)
