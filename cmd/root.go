@@ -55,7 +55,7 @@ func init() {
 	rootCmd.PersistentFlags().BoolVarP(&cfg.SplitBook, "split", "s", false, "split sub-sections into separate books")
 	rootCmd.PersistentFlags().StringVarP(&cfg.RoamDir, "roam-dir", "r", config.DefaultRoamDir, "path to the org-roam directory")
 	rootCmd.PersistentFlags().StringVarP(&cfg.RoamDBPath, "roam-db-path", "d", config.DefaultRoamDBPath, "path to the org-roam sqlite3 database")
-	rootCmd.PersistentFlags().StringVar(&cfg.DBDriver, "db-driver", db.SqlDriverSqinn, "the database driver to use")
+	rootCmd.PersistentFlags().StringVar(&cfg.DBDriver, "db-driver", db.SqlDriverSqilite3, "the database driver to use")
 	rootCmd.PersistentFlags().StringVar(&cfg.Parser, "parser", config.DefaultParser, "the parser to use")
 	rootCmd.PersistentFlags().BoolVarP(&cfg.InsertRoamLink, "insert-roam-link", "l", true, "insert the roam links")
 	rootCmd.PersistentFlags().BoolVarP(&cfg.AuthorSubDir, "author-sub-dir", "a", true, "create sub-directory with the name of the author")

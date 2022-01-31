@@ -36,7 +36,7 @@ func LoadConfig(cfgFile string, cfg *Config) error {
 	viper.SetDefault("SplitBook", false)
 	viper.SetDefault("RoamDir", DefaultRoamDir)
 	viper.SetDefault("RoamDBPath", DefaultRoamDBPath)
-	viper.SetDefault("DBDriver", db.SqlDriverSqinn)
+	viper.SetDefault("DBDriver", db.SqlDriverSqilite3)
 	viper.SetDefault("Parser", DefaultParser)
 	viper.SetDefault("InsertRoamLink", true)
 	viper.SetDefault("AuthorSubDir", false)

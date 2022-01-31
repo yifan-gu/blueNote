@@ -2,7 +2,7 @@ package db
 
 import (
 	"fmt"
-	"strings"
+	//"strings"
 
 	"github.com/cvilsmeier/sqinn-go/sqinn"
 )
@@ -25,21 +25,22 @@ func newSqinnWrapper(dbPath string) (*SqinnWrapper, error) {
 	return &SqinnWrapper{sq, dbPath}, nil
 }
 
-func createCommitSql(sqls []string) string {
-	sqls = append([]string{sqlite3BeginTransactionSQL}, sqls...)
-	sqls = append(sqls, sqlite3CommitTransactionSQL)
-	return strings.Join(sqls, ";\n")
+func createCommitSql(sqls []*SQL) string {
+	//sqls = append([]string{sqlite3BeginTransactionSQL}, sqls...)
+	//sqls = append(sqls, sqlite3CommitTransactionSQL)
+	//return strings.Join(sqls, ";\n")
+	return ""
 }
 
-func (s *SqinnWrapper) CommitTransaction(sqls []string) error {
-	if err := s.Open(s.dbPath); err != nil {
-		return fmt.Errorf("failed to open sqlite3 database for %s: %v", s.dbPath, err)
-	}
-	defer s.Close()
-
-	if _, err := s.ExecOne(createCommitSql(sqls)); err != nil {
-		return fmt.Errorf("failed to execute sql insertion: %v", err)
-	}
+func (s *SqinnWrapper) CommitTransaction(sqls []*SQL) error {
+	//if err := s.Open(s.dbPath); err != nil {
+	//	return fmt.Errorf("failed to open sqlite3 database for %s: %v", s.dbPath, err)
+	//}
+	//defer s.Close()
+	//
+	//if _, err := s.ExecOne(createCommitSql(sqls)); err != nil {
+	//	return fmt.Errorf("failed to execute sql insertion: %v", err)
+	//}
 	return nil
 }
 

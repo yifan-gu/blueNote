@@ -5,17 +5,25 @@ import (
 )
 
 type SqlInterface interface {
-	CommitTransaction([]string) error
+	CommitTransaction([]*SQL) error
 	Close() error
 }
 
 const (
-	SqlDriverSqinn = "sqinn"
-	SqlDriverMock  = "mock"
+	SqlDriverSqilite3 = "sqlite3"
+	SqlDriverSqinn    = "sqinn"
+	SqlDriverMock     = "mock"
 )
+
+type SQL struct {
+	Statement string
+	Values    []interface{}
+}
 
 func NewSqlInterface(dbPath, driver string) (SqlInterface, error) {
 	switch driver {
+	case SqlDriverSqilite3:
+		return newGoSqlite3Driver(dbPath)
 	case SqlDriverSqinn:
 		return newSqinnWrapper(dbPath)
 	case SqlDriverMock:

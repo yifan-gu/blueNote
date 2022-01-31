@@ -39,8 +39,8 @@ import (
 // type for note (no-op, because all treated as level 1 headlines, done)
 // ask for skip, replace all
 //
-// refactor book module, insert commit transaction
-//
+// refactor book module, insert commit transaction, book module
+// roam module
 
 type MarkType int
 
@@ -110,12 +110,12 @@ Section: {{ .Section }}
 {{ .Location }}
 `
 
+	b.UUID = uuid.New()
 	buf := new(bytes.Buffer)
 	titleT := template.Must(template.New("template").Parse(orgTitleTpl))
 	if err := titleT.Execute(buf, b); err != nil {
 		return nil, fmt.Errorf("failed to execute org template for title: %v", err)
 	}
-	b.UUID = uuid.New()
 
 	if err := sp.InsertNodeLinkTitleEntry(b, cfg.RoamDBPath, generateOutputPath(b, cfg)); err != nil {
 		return nil, err
@@ -232,6 +232,11 @@ func parseAndWrite(inputPath string, cfg *config.Config) error {
 		if err := writeRunesToFile(fullpath, r); err != nil {
 			return err
 		}
+
+		if err := sp.InsertFileEntry(bk, fullpath); err != nil {
+			return err
+		}
+
 		if err := sp.CommitSql(); err != nil {
 			return err
 		}
