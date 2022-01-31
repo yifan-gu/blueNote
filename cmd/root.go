@@ -38,7 +38,7 @@ func run(cmd *cobra.Command, args []string) {
 	}
 
 	if cfgFile != "" {
-		if err := config.LoadConfig(cfgFile, &cfg); err != nil {
+		if err := config.LoadConfig(cfgFile, &cfg, cmd); err != nil {
 			log.Fatal(err)
 		}
 	}
@@ -51,7 +51,8 @@ func run(cmd *cobra.Command, args []string) {
 
 func init() {
 	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "path to the config file, the command line parameters will override the config files if both are provided")
-	rootCmd.PersistentFlags().StringVarP(&cfg.OutputDir, "output", "o", "./", "output directory")
+
+	rootCmd.PersistentFlags().StringVarP(&cfg.OutputDir, "output-dir", "o", "./", "output directory")
 	rootCmd.PersistentFlags().BoolVarP(&cfg.SplitBook, "split", "s", false, "split sub-sections into separate books")
 	rootCmd.PersistentFlags().StringVarP(&cfg.RoamDir, "roam-dir", "r", config.DefaultRoamDir, "path to the org-roam directory")
 	rootCmd.PersistentFlags().BoolVarP(&cfg.AuthorSubDir, "author-sub-dir", "a", true, "create sub-directory with the name of the author")
@@ -65,4 +66,5 @@ func init() {
 
 	rootCmd.PersistentFlags().BoolVarP(&cfg.PromptYesToAll, "yes-to-all", "y", false, "set yes to all prompt confirmation")
 	rootCmd.PersistentFlags().BoolVarP(&cfg.PromptNoToAll, "no-to-all", "n", false, "set no to all prompt confirmation")
+
 }

@@ -17,6 +17,7 @@ import (
 
 	"github.com/yifan-gu/klipping2org/pkg/config"
 	"github.com/yifan-gu/klipping2org/pkg/db"
+	"github.com/yifan-gu/klipping2org/pkg/util"
 )
 
 type MarkType int
@@ -209,8 +210,10 @@ func parseAndWrite(inputPath string, cfg *config.Config) error {
 		// To fix non-English encoding issue.
 		r := []rune(string(b))
 
-		fullpath := generateOutputPath(bk, cfg)
-
+		fullpath, err := util.ResolvePath(generateOutputPath(bk, cfg))
+		if err != nil {
+			return err
+		}
 		dir := filepath.Dir(fullpath)
 		if _, err := os.Stat(dir); os.IsNotExist(err) {
 			confirm, err := PromptConfirmation(cfg, fmt.Sprintf("directory %s doesn't exit, create?", dir))
