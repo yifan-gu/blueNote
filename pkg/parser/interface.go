@@ -34,5 +34,5 @@ func NewSqlPlanner(driver db.SqlInterface, updateRoamDB bool) SqlPlanner {
 	if updateRoamDB {
 		return &sqlPlanner{driver: driver}
 	}
-	return &mockSqlPlanner{}
+	return &dummySqlPlanner{}
 }
