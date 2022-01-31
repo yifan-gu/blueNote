@@ -13,24 +13,20 @@ import (
 	"github.com/yifan-gu/klipping2org/pkg/util"
 )
 
-type SqlPlanner struct {
+type sqlPlanner struct {
 	driver db.SqlInterface
 	sqls   []*db.SQL
 }
 
-func NewSqlPlanner(driver db.SqlInterface) *SqlPlanner {
-	return &SqlPlanner{driver: driver}
+func (s *sqlPlanner) InsertNodeLinkTitleEntry(book *Book, outputPath string) error {
+	return s.insertNodeLinkEntry(book, outputPath, book.UUID.String(), "", 0, 1)
 }
 
-func (s *SqlPlanner) InsertNodeLinkTitleEntry(book *Book, roamDBPath, outputPath string) error {
-	return s.insertNodeLinkEntry(book, roamDBPath, outputPath, book.UUID.String(), "", 0, 1)
+func (s *sqlPlanner) InsertNodeLinkMarkEntry(book *Book, mark *Mark, outputPath string) error {
+	return s.insertNodeLinkEntry(book, outputPath, mark.UUID.String(), mark.Data, 1, mark.Pos)
 }
 
-func (s *SqlPlanner) InsertNodeLinkMarkEntry(book *Book, mark *Mark, roamDBPath, outputPath string) error {
-	return s.insertNodeLinkEntry(book, roamDBPath, outputPath, mark.UUID.String(), mark.Data, 1, mark.Pos)
-}
-
-func (s *SqlPlanner) InsertFileEntry(book *Book, fullpath string) error {
+func (s *sqlPlanner) InsertFileEntry(book *Book, fullpath string) error {
 	hash, err := computeHash(fullpath)
 	if err != nil {
 		return err
@@ -70,7 +66,7 @@ func quoteString(str string) string {
 	return fmt.Sprintf("%q", str)
 }
 
-func (s *SqlPlanner) insertNodeLinkEntry(book *Book, roamDBPath, outputPath, uuid, data string, level, pos int) error {
+func (s *sqlPlanner) insertNodeLinkEntry(book *Book, outputPath, uuid, data string, level, pos int) error {
 	properties, err := generateProperties(book, uuid, outputPath, data)
 	if err != nil {
 		return err
@@ -92,7 +88,7 @@ func (s *SqlPlanner) insertNodeLinkEntry(book *Book, roamDBPath, outputPath, uui
 	return nil
 }
 
-func (s *SqlPlanner) CommitSql() error {
+func (s *sqlPlanner) CommitSql() error {
 	return s.driver.CommitTransaction(s.sqls)
 }
 

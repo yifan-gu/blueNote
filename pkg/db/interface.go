@@ -11,7 +11,6 @@ type SqlInterface interface {
 
 const (
 	SqlDriverSqilite3 = "sqlite3"
-	SqlDriverSqinn    = "sqinn"
 	SqlDriverMock     = "mock"
 )
 
@@ -20,12 +19,14 @@ type SQL struct {
 	Values    []interface{}
 }
 
+func (s *SQL) String() string {
+	return fmt.Sprint(s.Statement, s.Values)
+}
+
 func NewSqlInterface(dbPath, driver string) (SqlInterface, error) {
 	switch driver {
 	case SqlDriverSqilite3:
 		return newGoSqlite3Driver(dbPath)
-	case SqlDriverSqinn:
-		return newSqinnWrapper(dbPath)
 	case SqlDriverMock:
 		return newSqlite3Mock(dbPath)
 	default:

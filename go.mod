@@ -5,6 +5,7 @@ go 1.17
 require (
 	github.com/cvilsmeier/sqinn-go v1.1.2
 	github.com/google/uuid v1.1.2
+	github.com/mattn/go-sqlite3 v1.14.11
 	github.com/spf13/cobra v1.3.0
 	github.com/spf13/viper v1.10.0
 	github.com/stretchr/testify v1.7.0

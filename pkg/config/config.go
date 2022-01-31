@@ -14,15 +14,21 @@ import (
 )
 
 type Config struct {
-	InputPath      string
-	OutputDir      string
-	SplitBook      bool
-	RoamDir        string
-	RoamDBPath     string
-	DBDriver       string
+	InputPath    string
+	OutputDir    string
+	SplitBook    bool
+	RoamDir      string
+	AuthorSubDir bool
+
+	UpdateRoamDB bool
+	RoamDBPath   string
+	DBDriver     string
+
 	Parser         string
 	InsertRoamLink bool
-	AuthorSubDir   bool
+
+	PromptYesToAll bool
+	PromptNoToAll  bool
 }
 
 const (
@@ -35,11 +41,17 @@ func LoadConfig(cfgFile string, cfg *Config) error {
 	viper.SetDefault("OutputDir", "./")
 	viper.SetDefault("SplitBook", false)
 	viper.SetDefault("RoamDir", DefaultRoamDir)
+	viper.SetDefault("AuthorSubDir", true)
+
+	viper.SetDefault("UpdateRoamDB", false)
 	viper.SetDefault("RoamDBPath", DefaultRoamDBPath)
 	viper.SetDefault("DBDriver", db.SqlDriverSqilite3)
+
 	viper.SetDefault("Parser", DefaultParser)
 	viper.SetDefault("InsertRoamLink", true)
-	viper.SetDefault("AuthorSubDir", false)
+
+	viper.SetDefault("PromptYesToAll", false)
+	viper.SetDefault("PromptNoToAll", false)
 
 	f, err := os.Open(cfgFile)
 	if err != nil {
@@ -53,11 +65,17 @@ func LoadConfig(cfgFile string, cfg *Config) error {
 	cfg.OutputDir = viper.GetString("OutputDir")
 	cfg.SplitBook = viper.GetBool("SplitBook")
 	cfg.RoamDir = viper.GetString("RoamDir")
+	cfg.AuthorSubDir = viper.GetBool("AuthorSubDir")
+
+	cfg.UpdateRoamDB = viper.GetBool("UpdateRoamDB")
 	cfg.RoamDBPath = viper.GetString("RoamDBPath")
 	cfg.DBDriver = viper.GetString("DBDriver")
+
 	cfg.Parser = viper.GetString("Parser")
 	cfg.InsertRoamLink = viper.GetBool("InsertRoamLink")
-	cfg.AuthorSubDir = viper.GetBool("AuthorSubDir")
+
+	cfg.PromptYesToAll = viper.GetBool("PromptYesToAll")
+	cfg.PromptNoToAll = viper.GetBool("PromptNoToAll")
 
 	return nil
 }

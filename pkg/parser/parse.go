@@ -19,29 +19,6 @@ import (
 	"github.com/yifan-gu/klipping2org/pkg/db"
 )
 
-// TODO: chapter data, sectionHeading (done)
-// struct of the entry (done)
-// parse location (done)
-// parse page number (done)
-// write to file (done)
-// parse multiple books (done)
-//
-// compute title (done)
-// iterate entries, figure out pos val (done)
-// insert database
-// cmdline argument first
-//
-// optional roam db
-// optional author dir
-// check roam version
-
-// default org roam dir (done)
-// type for note (no-op, because all treated as level 1 headlines, done)
-// ask for skip, replace all
-//
-// refactor book module, insert commit transaction, book module
-// roam module
-
 type MarkType int
 
 const (
@@ -85,10 +62,13 @@ type Book struct {
 
 func generateOutputPath(b *Book, cfg *config.Config) string {
 	filename := fmt.Sprintf("《%s》 by %s.org", b.Title, b.Author)
+	if cfg.AuthorSubDir {
+		return filepath.Join(cfg.OutputDir, b.Author, filename)
+	}
 	return filepath.Join(cfg.OutputDir, filename)
 }
 
-func (b *Book) FormatOrg(sp *SqlPlanner, cfg *config.Config) ([]byte, error) {
+func (b *Book) FormatOrg(sp SqlPlanner, cfg *config.Config) ([]byte, error) {
 	const orgTitleTpl = `:PROPERTIES:
 :ID:       {{ .UUID }}
 :END:
@@ -117,7 +97,7 @@ Section: {{ .Section }}
 		return nil, fmt.Errorf("failed to execute org template for title: %v", err)
 	}
 
-	if err := sp.InsertNodeLinkTitleEntry(b, cfg.RoamDBPath, generateOutputPath(b, cfg)); err != nil {
+	if err := sp.InsertNodeLinkTitleEntry(b, generateOutputPath(b, cfg)); err != nil {
 		return nil, err
 	}
 
@@ -125,7 +105,7 @@ Section: {{ .Section }}
 		mk.UUID = uuid.New()
 		mk.Pos = len([]rune(buf.String())) + len("\n*")
 
-		if err := sp.InsertNodeLinkMarkEntry(b, mk, cfg.RoamDBPath, generateOutputPath(b, cfg)); err != nil {
+		if err := sp.InsertNodeLinkMarkEntry(b, mk, generateOutputPath(b, cfg)); err != nil {
 			return nil, err
 		}
 
@@ -220,7 +200,7 @@ func parseAndWrite(inputPath string, cfg *config.Config) error {
 	}
 
 	for _, bk := range books {
-		sp := NewSqlPlanner(sq)
+		sp := NewSqlPlanner(sq, cfg.UpdateRoamDB)
 		b, err := bk.FormatOrg(sp, cfg)
 		if err != nil {
 			return err
@@ -228,7 +208,32 @@ func parseAndWrite(inputPath string, cfg *config.Config) error {
 
 		// To fix non-English encoding issue.
 		r := []rune(string(b))
+
 		fullpath := generateOutputPath(bk, cfg)
+
+		dir := filepath.Dir(fullpath)
+		if _, err := os.Stat(dir); os.IsNotExist(err) {
+			confirm, err := PromptConfirmation(cfg, fmt.Sprintf("directory %s doesn't exit, create?", dir))
+			if err != nil {
+				return err
+			}
+			if confirm {
+				if err := os.MkdirAll(dir, 0755); err != nil {
+					return fmt.Errorf("failed to create dir %q: %v", dir, err)
+				}
+			}
+		}
+
+		if _, err := os.Stat(fullpath); err == nil || !os.IsNotExist(err) {
+			confirm, err := PromptConfirmation(cfg, fmt.Sprintf("file %s already exits, replace?", fullpath))
+			if err != nil {
+				return err
+			}
+			if !confirm {
+				continue
+			}
+		}
+
 		if err := writeRunesToFile(fullpath, r); err != nil {
 			return err
 		}
@@ -240,6 +245,8 @@ func parseAndWrite(inputPath string, cfg *config.Config) error {
 		if err := sp.CommitSql(); err != nil {
 			return err
 		}
+
+		fmt.Println("Successfully created:", fullpath)
 	}
 
 	return nil
