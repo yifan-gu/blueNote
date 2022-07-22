@@ -26,6 +26,7 @@ type Config struct {
 	DBDriver     string
 
 	Parser         string
+	TemplateType   int
 	InsertRoamLink bool
 
 	PromptYesToAll bool
@@ -33,9 +34,10 @@ type Config struct {
 }
 
 const (
-	DefaultRoamDir    = "~/org/roam"
-	DefaultRoamDBPath = "~/.emacs.d/.local/etc/org-roam.db"
-	DefaultParser     = "htmlclipping"
+	DefaultRoamDir      = "~/org/roam"
+	DefaultRoamDBPath   = "~/.emacs.d/.local/etc/org-roam.db"
+	DefaultParser       = "htmlclipping"
+	DefaultTemplateType = 1
 )
 
 func LoadConfig(cfgFile string, cfg *Config, cmd *cobra.Command) error {
@@ -50,6 +52,7 @@ func LoadConfig(cfgFile string, cfg *Config, cmd *cobra.Command) error {
 
 	viper.BindPFlag("PARSER", cmd.PersistentFlags().Lookup("parser"))
 	viper.BindPFlag("INSERT_ROAM_LINK", cmd.PersistentFlags().Lookup("insert-roam-link"))
+	viper.BindPFlag("TEMPLATE_TYPE", cmd.PersistentFlags().Lookup("template-type"))
 
 	viper.BindPFlag("PROMPT_YES_TO_ALL", cmd.PersistentFlags().Lookup("yes-to-all"))
 	viper.BindPFlag("PROMPT_NO_TO_ALL", cmd.PersistentFlags().Lookup("no-to-all"))
@@ -76,6 +79,7 @@ func LoadConfig(cfgFile string, cfg *Config, cmd *cobra.Command) error {
 
 	cfg.Parser = viper.GetString("PARSER")
 	cfg.InsertRoamLink = viper.GetBool("INSERT_ROAM_LINK")
+	cfg.TemplateType = viper.GetInt("TEMPLATE_TYPE")
 
 	cfg.PromptYesToAll = viper.GetBool("PROMPT_YES_TO_ALL")
 	cfg.PromptNoToAll = viper.GetBool("PROMPT_NO_TO_ALL")

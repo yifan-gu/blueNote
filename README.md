@@ -1,5 +1,5 @@
 # klipping2org
-Convert Kindle Clipping HTML to Org
+Convert Kindle Clipping to Org
 
 
 ## Usage

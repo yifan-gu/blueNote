@@ -63,6 +63,7 @@ func init() {
 
 	rootCmd.PersistentFlags().StringVar(&cfg.Parser, "parser", config.DefaultParser, "the parser to use")
 	rootCmd.PersistentFlags().BoolVarP(&cfg.InsertRoamLink, "insert-roam-link", "l", true, "insert the roam links")
+	rootCmd.PersistentFlags().IntVar(&cfg.TemplateType, "template-type", config.DefaultTemplateType, "the type of the template to use")
 
 	rootCmd.PersistentFlags().BoolVarP(&cfg.PromptYesToAll, "yes-to-all", "y", false, "set yes to all prompt confirmation")
 	rootCmd.PersistentFlags().BoolVarP(&cfg.PromptNoToAll, "no-to-all", "n", false, "set no to all prompt confirmation")

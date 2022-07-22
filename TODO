@@ -1,3 +1,5 @@
+* Fix location
+* Generate json
 * roam module (fix bug)
 * check roam version
 * refactor book module

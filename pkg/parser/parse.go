@@ -70,26 +70,14 @@ func generateOutputPath(b *Book, cfg *config.Config) string {
 }
 
 func (b *Book) FormatOrg(sp SqlPlanner, cfg *config.Config) ([]byte, error) {
-	const orgTitleTpl = `:PROPERTIES:
-:ID:       {{ .UUID }}
-:END:
-#+title: {{ .Title }}
-#+filetags: :{{ .Author }}:
+	var orgTitleTpl, orgEntryTpl string
 
-`
-	const orgEntryTpl = `
-* {{ .Data }}
-:PROPERTIES:
-:ID:       {{ .UUID }}
-:END:
-{{ .Type }} @
-{{- if eq .Location.Chapter "" }}
-Chapter: {{ .Section }}
-{{ else }}
-Section: {{ .Section }}
-{{ end -}}
-{{ .Location }}
-`
+	if cfg.TemplateType < 0 || cfg.TemplateType > len(OrgTemplates) {
+		orgTitleTpl = OrgTemplates[1].TitleTemplate
+		orgEntryTpl = OrgTemplates[1].EntryTemplate
+	}
+	orgTitleTpl = OrgTemplates[cfg.TemplateType].TitleTemplate
+	orgEntryTpl = OrgTemplates[cfg.TemplateType].EntryTemplate
 
 	b.UUID = uuid.New()
 	buf := new(bytes.Buffer)
