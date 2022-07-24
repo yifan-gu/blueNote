@@ -23,15 +23,15 @@ import (
 
 type Location struct {
 	Chapter  string
-	Page     string
-	Location string
+	Page     int
+	Location int
 }
 
 func (l Location) String() string {
 	if l.Chapter != "" {
-		return fmt.Sprintf("Chapter: %s Page: %s Loc: %s", l.Chapter, l.Page, l.Location)
+		return fmt.Sprintf("Chapter: %s Page: %d Loc: %d", l.Chapter, l.Page, l.Location)
 	}
-	return fmt.Sprintf("Page: %s Loc: %s", l.Page, l.Location)
+	return fmt.Sprintf("Page: %d Loc: %d", l.Page, l.Location)
 }
 
 type Mark struct {

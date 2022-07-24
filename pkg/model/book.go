@@ -24,8 +24,8 @@ var MarkTypeString = map[MarkType]string{
 // Location defines the location of a mark in the book.
 type Location struct {
 	Chapter  string
-	Page     string
-	Location string
+	Page     int
+	Location int
 }
 
 // Mark defines the details of a mark object.

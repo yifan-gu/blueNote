@@ -11,11 +11,15 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/yifan-gu/BlueNote/pkg/model"
 	"golang.org/x/net/html"
 )
+
+var numberRegexp = regexp.MustCompile(`\d+`)
 
 type KindleHTMLParser struct{}
 
@@ -87,16 +91,9 @@ func handleNextText(tokenizer *html.Tokenizer, f func(tokenizer *html.Tokenizer)
 	return nil
 }
 
-func trimLocationString(location []byte) []byte {
-	for i := range location {
-		if location[i] < '0' || location[i] > '9' {
-			return location[0:i]
-		}
-	}
-	return location
-}
-
 func parseLocationWithoutChapter(data []byte) model.Location {
+	var err error
+	var pg, lc = -1, -1
 	var page, location []byte
 
 	pageMarker, locMarker := []byte("Page"), []byte("Location")
@@ -109,9 +106,22 @@ func parseLocationWithoutChapter(data []byte) model.Location {
 			location = tuples[i+1]
 		}
 	}
-	location = trimLocationString(location)
+	match := numberRegexp.FindSubmatch(page)
+	if len(match) == 1 {
+		pg, err = strconv.Atoi(string(match[0]))
+		if err != nil {
+			panic(err)
+		}
+	}
 
-	return model.Location{Page: string(page), Location: string(location)}
+	match = numberRegexp.FindSubmatch(location)
+	if len(match) == 1 {
+		lc, err = strconv.Atoi(string(match[0]))
+		if err != nil {
+			panic(err)
+		}
+	}
+	return model.Location{Page: pg, Location: lc}
 }
 
 func parseLocationWithChapter(chapterData, data []byte) model.Location {

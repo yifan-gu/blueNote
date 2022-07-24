@@ -31,10 +31,10 @@ var OrgTemplates = []OrgTemplate{
 {{- else }}
 :CHAPTER:  {{ .Section }}
 {{- end }}
-{{- if ne .Location.Page "" }}
+{{- if gt .Location.Page 0 }}
 :PAGE:     {{ .Location.Page }}
 {{- end }}
-{{- if ne .Location.Location "" }}
+{{- if gt .Location.Location 0 }}
 :LOCATION: {{ .Location.Location }}
 {{- end }}
 :END:
