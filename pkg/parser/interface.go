@@ -10,7 +10,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/yifan-gu/BlueNote/pkg/model"
+	"github.com/yifan-gu/blueNote/pkg/model"
 )
 
 var registeredParsers map[string]Parser

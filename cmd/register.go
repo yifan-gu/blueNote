@@ -1,10 +1,10 @@
 package cmd
 
 import (
-	"github.com/yifan-gu/BlueNote/pkg/exporter"
-	"github.com/yifan-gu/BlueNote/pkg/exporter/orgroam"
-	"github.com/yifan-gu/BlueNote/pkg/parser"
-	"github.com/yifan-gu/BlueNote/pkg/parser/kindlehtml"
+	"github.com/yifan-gu/blueNote/pkg/exporter"
+	"github.com/yifan-gu/blueNote/pkg/exporter/orgroam"
+	"github.com/yifan-gu/blueNote/pkg/parser"
+	"github.com/yifan-gu/blueNote/pkg/parser/kindlehtml"
 )
 
 func registerParsers() {

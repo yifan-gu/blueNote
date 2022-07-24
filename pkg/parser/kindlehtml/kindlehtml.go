@@ -15,7 +15,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/yifan-gu/BlueNote/pkg/model"
+	"github.com/yifan-gu/blueNote/pkg/model"
 	"golang.org/x/net/html"
 )
 

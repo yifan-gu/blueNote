@@ -1,21 +1,47 @@
-BlueNote
+blueNote
 ============
 Organize reading notes and clippings
 
 
+## Build
+
+```
+git clone git@github.com:yifan-gu/blueNote.git && go build
+./blueNote -h
+```
+
 ## Usage
 
+#### Export notes to html with Kindle App
+![Export Notes From Kindle App](screenshots/export-notes-from-kindle-app.png)
+
+#### Convert notes to org-roam files
 ```
-git clone git@github.com:yifan-gu/BlueNote.git && go build -o bluenote
-./bluenote -h
+./blueNote -i kindlehtml -o org-roam examples/kindle_html_single_book_example.html ./
 ```
 
-## Example
+#### Add `-s` if the book is a collection of multiple books
+```
+./blueNote -i kindlehtml -o org-roam -s examples/kindle_html_collection_example.html ./
+```
 
-### Generate org-roam files to the local folder from a kindle html clipping file
-```
-./bluenote -i kindlehtml -o org-roam -s examples/kindle_html_example.html ./
-```
+#### Browse and edit the notes with tags
+![View and Edit Notes in Emacs Org-roam](screenshots/view-notes-with-emacs-org-roam.png)
+
+#### Remember to run `M-x org-roam-db-sync` to sync the org-roam database
+![Run org-roam-db-sync](screenshots/org-roam-db-sync.png)
+
+#### 📖 Happy Notes Searching! 📖
+![Search for Notes in Emacs Org-roam](screenshots/search-keywords-with-emacs-org-roam.png)
+
+
+### References
+
+- Doom Emacs: https://github.com/doomemacs/doomemacs
+- Org-roam: https://www.orgroam.com/
+- My Doom Emacs config: https://github.com/yifan-gu/.doom
+- A [custom Emacs theme](https://github.com/yifan-gu/.doom/blob/master/themes/org-leuven-theme.el) I made for Org-roam mode based on [leuven](https://github.com/fniessen/emacs-leuven-theme)
+
 
 ## TODO
 
@@ -44,8 +70,8 @@ Web/App:
 - [ ] Generate tags automatically
 - [ ] Connected notes suggestion
 
-Social:
+User Interaction:
 - [ ] User ratings
-- [ ] User comments
+- [ ] User comments?
 - [ ] User profiles
 - [ ] User upload audiobook readings?

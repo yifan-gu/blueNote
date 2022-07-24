@@ -14,8 +14,8 @@ import (
 	"path/filepath"
 	"text/template"
 
-	"github.com/yifan-gu/BlueNote/pkg/exporter/orgroam/db"
-	"github.com/yifan-gu/BlueNote/pkg/util"
+	"github.com/yifan-gu/blueNote/pkg/exporter/orgroam/db"
+	"github.com/yifan-gu/blueNote/pkg/util"
 )
 
 type SqlPlanner interface {

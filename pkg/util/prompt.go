@@ -11,7 +11,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/yifan-gu/BlueNote/pkg/config"
+	"github.com/yifan-gu/blueNote/pkg/config"
 )
 
 func PromptConfirmation(cfg *config.Config, prompt string) (bool, error) {

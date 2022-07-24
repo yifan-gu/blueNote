@@ -9,10 +9,10 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/yifan-gu/BlueNote/pkg/config"
-	"github.com/yifan-gu/BlueNote/pkg/exporter"
-	"github.com/yifan-gu/BlueNote/pkg/model"
-	"github.com/yifan-gu/BlueNote/pkg/parser"
+	"github.com/yifan-gu/blueNote/pkg/config"
+	"github.com/yifan-gu/blueNote/pkg/exporter"
+	"github.com/yifan-gu/blueNote/pkg/model"
+	"github.com/yifan-gu/blueNote/pkg/parser"
 )
 
 var (
@@ -21,7 +21,7 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "BlueNote",
+	Use:   "blueNote",
 	Short: "Convert Kindle exported clipping html(s) to org file(s)",
 	Run:   run,
 }

@@ -10,8 +10,8 @@ import (
 	"log"
 	"strings"
 
-	"github.com/yifan-gu/BlueNote/pkg/config"
-	"github.com/yifan-gu/BlueNote/pkg/model"
+	"github.com/yifan-gu/blueNote/pkg/config"
+	"github.com/yifan-gu/blueNote/pkg/model"
 )
 
 var registeredExporters map[string]Exporter

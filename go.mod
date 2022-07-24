@@ -1,4 +1,4 @@
-module github.com/yifan-gu/BlueNote
+module github.com/yifan-gu/blueNote
 
 go 1.17
 

@@ -15,10 +15,10 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/yifan-gu/BlueNote/pkg/config"
-	"github.com/yifan-gu/BlueNote/pkg/exporter/orgroam/db"
-	"github.com/yifan-gu/BlueNote/pkg/model"
-	"github.com/yifan-gu/BlueNote/pkg/util"
+	"github.com/yifan-gu/blueNote/pkg/config"
+	"github.com/yifan-gu/blueNote/pkg/exporter/orgroam/db"
+	"github.com/yifan-gu/blueNote/pkg/model"
+	"github.com/yifan-gu/blueNote/pkg/util"
 )
 
 type Location struct {
