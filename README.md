@@ -1,12 +1,17 @@
-# klipping2org
-Convert Kindle Clipping to Org
+# BlueNote
+Note and Clipping Organization
 
 
 ## Usage
 
 ```
-git clone git@github.com:yifan-gu/klipping2org.git
-cd klipping2org
-go build
-./klipping2org example.html -s -o ~/org/roam/clippings
+git clone git@github.com:yifan-gu/BlueNote.git && go build -o bluenote
+./bluenote -h
+```
+
+## Example
+
+### Generate org-roam files to the local folder from a kindle html clipping file
+```
+./bluenote -i kindlehtml -o orgroam -s examples/kindle_html_example.html ./
 ```

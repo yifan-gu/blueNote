@@ -3,7 +3,7 @@ Copyright © 2022 Yifan Gu <guyifan1121@gmail.com>
 
 */
 
-package parser
+package orgroam
 
 type OrgTemplate struct {
 	TitleTemplate string
@@ -25,14 +25,19 @@ var OrgTemplates = []OrgTemplate{
 * {{ .Data }}
 :PROPERTIES:
 :ID:       {{ .UUID }}
+:TYPE:     {{ .Type }}
+{{- if ne .Location.Chapter "" }}
+:CHAPTER:  {{ .Location.Chapter }}
+{{- else }}
+:CHAPTER:  {{ .Section }}
+{{- end }}
+{{- if ne .Location.Page "" }}
+:PAGE:     {{ .Location.Page }}
+{{- end }}
+{{- if ne .Location.Location "" }}
+:LOCATION: {{ .Location.Location }}
+{{- end }}
 :END:
-{{ .Type }} @
-{{- if eq .Location.Chapter "" }}
-Chapter: {{ .Section }}
-{{ else }}
-Section: {{ .Section }}
-{{ end -}}
-{{ .Location }}
 `,
 	},
 	{
@@ -41,14 +46,14 @@ Section: {{ .Section }}
 * {{ .Data }}
 :PROPERTIES:
 :ID:       {{ .UUID }}
-:TYPE:     {{ .Type }}
-{{- if eq .Location.Chapter "" }}
-:CHAPTER:  {{ .Section }}
-{{ else }}
-:SECTION:  {{ .Section }}
-{{ end -}}
-:LOCATION: {{ .Location }}
 :END:
+{{ .Type }} @
+{{- if ne .Location.Chapter "" }}
+Chapter: {{ .Location.Chapter }}
+{{- else }}
+Chapter: {{ .Section }}
+{{- end }}
+{{ .Location }}
 `,
 	},
 }

@@ -15,8 +15,12 @@ import (
 )
 
 type Config struct {
-	InputPath    string
-	OutputDir    string
+	InputPath string
+	OutputDir string
+
+	Parser   string
+	Exporter string
+
 	SplitBook    bool
 	RoamDir      string
 	AuthorSubDir bool
@@ -25,7 +29,6 @@ type Config struct {
 	RoamDBPath   string
 	DBDriver     string
 
-	Parser         string
 	TemplateType   int
 	InsertRoamLink bool
 
@@ -36,12 +39,13 @@ type Config struct {
 const (
 	DefaultRoamDir      = "~/org/roam"
 	DefaultRoamDBPath   = "~/.emacs.d/.local/etc/org-roam.db"
-	DefaultParser       = "htmlclipping"
-	DefaultTemplateType = 1
+	DefaultParser       = "kindlehtml" // TODO(yifan): Refactor the config defaults
+	DefaultExporter     = "orgroam"    // TODO(yifan): Refactor the config defaults
+	DefaultSqlDriver    = "sqlite3"
+	DefaultTemplateType = 0
 )
 
 func LoadConfig(cfgFile string, cfg *Config, cmd *cobra.Command) error {
-	viper.BindPFlag("OUTPUT_DIR", cmd.PersistentFlags().Lookup("output-dir"))
 	viper.BindPFlag("SPLIT_BOOK", cmd.PersistentFlags().Lookup("split"))
 	viper.BindPFlag("ROAM_DIR", cmd.PersistentFlags().Lookup("roam-dir"))
 	viper.BindPFlag("AUTHOR_SUBDIR", cmd.PersistentFlags().Lookup("author-sub-dir"))
@@ -51,6 +55,7 @@ func LoadConfig(cfgFile string, cfg *Config, cmd *cobra.Command) error {
 	viper.BindPFlag("DB_DRIVER", cmd.PersistentFlags().Lookup("db-driver"))
 
 	viper.BindPFlag("PARSER", cmd.PersistentFlags().Lookup("parser"))
+	viper.BindPFlag("EXPORTER", cmd.PersistentFlags().Lookup("exporter"))
 	viper.BindPFlag("INSERT_ROAM_LINK", cmd.PersistentFlags().Lookup("insert-roam-link"))
 	viper.BindPFlag("TEMPLATE_TYPE", cmd.PersistentFlags().Lookup("template-type"))
 
@@ -68,7 +73,6 @@ func LoadConfig(cfgFile string, cfg *Config, cmd *cobra.Command) error {
 		return fmt.Errorf("failed to read config file %s: %v", cfgFile, err)
 	}
 
-	cfg.OutputDir = viper.GetString("OUTPUT_DIR")
 	cfg.SplitBook = viper.GetBool("SPLIT_BOOK")
 	cfg.RoamDir = viper.GetString("ROAM_DIR")
 	cfg.AuthorSubDir = viper.GetBool("AUTHOR_SUBDIR")
@@ -78,6 +82,7 @@ func LoadConfig(cfgFile string, cfg *Config, cmd *cobra.Command) error {
 	cfg.DBDriver = viper.GetString("DB_DRIVER")
 
 	cfg.Parser = viper.GetString("PARSER")
+	cfg.Parser = viper.GetString("EXPORTER")
 	cfg.InsertRoamLink = viper.GetBool("INSERT_ROAM_LINK")
 	cfg.TemplateType = viper.GetInt("TEMPLATE_TYPE")
 

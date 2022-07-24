@@ -1,4 +1,9 @@
-package parser
+/*
+Copyright © 2022 Yifan Gu <guyifan1121@gmail.com>
+
+*/
+
+package kindlehtml
 
 import (
 	"bufio"
@@ -8,12 +13,17 @@ import (
 	"os"
 	"strings"
 
+	"github.com/yifan-gu/BlueNote/pkg/model"
 	"golang.org/x/net/html"
 )
 
-type HtmlClippingParser struct{}
+type KindleHTMLParser struct{}
 
-func (p *HtmlClippingParser) Parse(inputPath string) (*Book, error) {
+func (p *KindleHTMLParser) Name() string {
+	return "kindlehtml"
+}
+
+func (p *KindleHTMLParser) Parse(inputPath string) (*model.Book, error) {
 	f, err := os.Open(inputPath)
 	defer f.Close()
 	if err != nil {
@@ -23,7 +33,7 @@ func (p *HtmlClippingParser) Parse(inputPath string) (*Book, error) {
 	buf := bufio.NewReader(f)
 	tokenizer := html.NewTokenizer(buf)
 
-	var book Book
+	var book model.Book
 	var section string
 
 	for {
@@ -86,7 +96,7 @@ func trimLocationString(location []byte) []byte {
 	return location
 }
 
-func parseLocationWithoutChapter(data []byte) *Location {
+func parseLocationWithoutChapter(data []byte) model.Location {
 	var page, location []byte
 
 	pageMarker, locMarker := []byte("Page"), []byte("Location")
@@ -101,10 +111,10 @@ func parseLocationWithoutChapter(data []byte) *Location {
 	}
 	location = trimLocationString(location)
 
-	return &Location{Page: string(page), Location: string(location)}
+	return model.Location{Page: string(page), Location: string(location)}
 }
 
-func parseLocationWithChapter(chapterData, data []byte) *Location {
+func parseLocationWithChapter(chapterData, data []byte) model.Location {
 	chapter := bytes.TrimLeft(chapterData, ") -")
 	chapter = bytes.TrimSpace(chapter)
 
@@ -114,7 +124,7 @@ func parseLocationWithChapter(chapterData, data []byte) *Location {
 	return loc
 }
 
-func parseLocation(data []byte) *Location {
+func parseLocation(data []byte) model.Location {
 
 	tuples := bytes.Split(data, []byte(">"))
 	switch len(tuples) {
@@ -128,9 +138,9 @@ func parseLocation(data []byte) *Location {
 
 }
 
-func handleHighlight(tokenizer *html.Tokenizer, book *Book, section string) {
-	mk := &Mark{
-		Type:    MarkTypeString[MarkTypeHighlight],
+func handleHighlight(tokenizer *html.Tokenizer, book *model.Book, section string) {
+	mk := model.Mark{
+		Type:    model.MarkTypeHighlight,
 		Section: section,
 	}
 
@@ -144,9 +154,9 @@ func handleHighlight(tokenizer *html.Tokenizer, book *Book, section string) {
 	book.Marks = append(book.Marks, mk)
 }
 
-func handleNote(tokenizer *html.Tokenizer, book *Book, section string) {
-	mk := &Mark{
-		Type:     MarkTypeString[MarkTypeNote],
+func handleNote(tokenizer *html.Tokenizer, book *model.Book, section string) {
+	mk := model.Mark{
+		Type:     model.MarkTypeNote,
 		Section:  section,
 		Location: parseLocation(tokenizer.Raw()),
 	}
@@ -157,7 +167,7 @@ func handleNote(tokenizer *html.Tokenizer, book *Book, section string) {
 	book.Marks = append(book.Marks, mk)
 }
 
-func handleNoteEntry(tokenizer *html.Tokenizer, book *Book, section string) error {
+func handleNoteEntry(tokenizer *html.Tokenizer, book *model.Book, section string) error {
 	return handleNextText(tokenizer, func(tokenizer *html.Tokenizer) {
 		switch {
 		case strings.HasPrefix(string(tokenizer.Raw()), "Highlight"):

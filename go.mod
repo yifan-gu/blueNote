@@ -1,4 +1,4 @@
-module github.com/yifan-gu/klipping2org
+module github.com/yifan-gu/BlueNote
 
 go 1.17
 

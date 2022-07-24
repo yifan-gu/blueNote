@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/yifan-gu/klipping2org/pkg/util"
+	"github.com/yifan-gu/BlueNote/pkg/util"
 )
 
 type GoSqlite3Driver struct {

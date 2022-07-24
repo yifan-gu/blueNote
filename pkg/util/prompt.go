@@ -1,4 +1,9 @@
-package parser
+/*
+Copyright © 2022 Yifan Gu <guyifan1121@gmail.com>
+
+*/
+
+package util
 
 import (
 	"bufio"
@@ -6,7 +11,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/yifan-gu/klipping2org/pkg/config"
+	"github.com/yifan-gu/BlueNote/pkg/config"
 )
 
 func PromptConfirmation(cfg *config.Config, prompt string) (bool, error) {

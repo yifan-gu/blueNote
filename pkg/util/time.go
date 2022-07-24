@@ -1,4 +1,9 @@
-package parser
+/*
+Copyright © 2022 Yifan Gu <guyifan1121@gmail.com>
+
+*/
+
+package util
 
 import (
 	"fmt"
@@ -34,10 +39,10 @@ func getEmacsTimestamp(path, typ string) (string, error) {
 	return fmt.Sprintf("(%d %d %d %d)", est[0], est[1], est[2], est[3]), nil
 }
 
-func getAtime(path string) (string, error) {
+func GetAtime(path string) (string, error) {
 	return getEmacsTimestamp(path, "atime")
 }
 
-func getMtime(path string) (string, error) {
+func GetMtime(path string) (string, error) {
 	return getEmacsTimestamp(path, "mtime")
 }

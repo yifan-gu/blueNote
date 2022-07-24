@@ -1,38 +1,41 @@
+/*
+Copyright © 2022 Yifan Gu <guyifan1121@gmail.com>
+
+*/
+
 package parser
 
 import (
 	"fmt"
+	"log"
+	"strings"
 
-	"github.com/yifan-gu/klipping2org/pkg/db"
+	"github.com/yifan-gu/BlueNote/pkg/model"
 )
+
+var registeredParsers map[string]Parser
 
 type Parser interface {
-	Parse(inputPath string) (*Book, error)
+	Name() string
+	Parse(inputPath string) (*model.Book, error)
 }
 
-const (
-	ParserTypeHtmlClippingParser = "htmlclipping"
-)
-
-func NewParser(parser string) (Parser, error) {
-	switch parser {
-	case ParserTypeHtmlClippingParser:
-		return &HtmlClippingParser{}, nil
-	default:
-		return nil, fmt.Errorf("unrecognized parser type: %q", parser)
+func RegisterParser(parser Parser) {
+	name := strings.ToLower(parser.Name())
+	if registeredParsers == nil {
+		registeredParsers = make(map[string]Parser)
 	}
-}
-
-type SqlPlanner interface {
-	InsertNodeLinkTitleEntry(book *Book, outputPath string) error
-	InsertNodeLinkMarkEntry(book *Book, mark *Mark, outputPath string) error
-	InsertFileEntry(book *Book, fullpath string) error
-	CommitSql() error
-}
-
-func NewSqlPlanner(driver db.SqlInterface, updateRoamDB bool) SqlPlanner {
-	if updateRoamDB {
-		return &sqlPlanner{driver: driver}
+	if _, ok := registeredParsers[name]; ok {
+		panic(fmt.Sprintf("Name conflict for parser %q", name))
 	}
-	return &dummySqlPlanner{}
+	registeredParsers[name] = parser
+}
+
+func GetParser(name string) Parser {
+	name = strings.ToLower(name)
+	parser, ok := registeredParsers[name]
+	if !ok {
+		log.Fatal(fmt.Errorf("unrecognized parser type: %q", name))
+	}
+	return parser
 }

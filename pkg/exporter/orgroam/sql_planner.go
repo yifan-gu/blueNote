@@ -1,4 +1,9 @@
-package parser
+/*
+Copyright © 2022 Yifan Gu <guyifan1121@gmail.com>
+
+*/
+
+package orgroam
 
 import (
 	"bytes"
@@ -9,9 +14,23 @@ import (
 	"path/filepath"
 	"text/template"
 
-	"github.com/yifan-gu/klipping2org/pkg/db"
-	"github.com/yifan-gu/klipping2org/pkg/util"
+	"github.com/yifan-gu/BlueNote/pkg/exporter/orgroam/db"
+	"github.com/yifan-gu/BlueNote/pkg/util"
 )
+
+type SqlPlanner interface {
+	InsertNodeLinkTitleEntry(book *Book, outputPath string) error
+	InsertNodeLinkMarkEntry(book *Book, mark *Mark, outputPath string) error
+	InsertFileEntry(book *Book, fullpath string) error
+	CommitSql() error
+}
+
+func newSqlPlanner(driver db.SqlInterface, updateRoamDB bool) SqlPlanner {
+	if updateRoamDB {
+		return &sqlPlanner{driver: driver}
+	}
+	return &noopSqlPlanner{}
+}
 
 type sqlPlanner struct {
 	driver db.SqlInterface
@@ -32,11 +51,11 @@ func (s *sqlPlanner) InsertFileEntry(book *Book, fullpath string) error {
 		return err
 	}
 
-	atime, err := getAtime(fullpath)
+	atime, err := util.GetAtime(fullpath)
 	if err != nil {
 		return err
 	}
-	mtime, err := getMtime(fullpath)
+	mtime, err := util.GetMtime(fullpath)
 	if err != nil {
 		return err
 	}
