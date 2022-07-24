@@ -40,7 +40,7 @@ const (
 	DefaultRoamDir      = "~/org/roam"
 	DefaultRoamDBPath   = "~/.emacs.d/.local/etc/org-roam.db"
 	DefaultParser       = "kindlehtml" // TODO(yifan): Refactor the config defaults
-	DefaultExporter     = "orgroam"    // TODO(yifan): Refactor the config defaults
+	DefaultExporter     = "org-roam"   // TODO(yifan): Refactor the config defaults
 	DefaultSqlDriver    = "sqlite3"
 	DefaultTemplateType = 0
 )

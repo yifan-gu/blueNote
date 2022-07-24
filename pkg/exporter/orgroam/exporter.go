@@ -139,7 +139,7 @@ func writeRunesToFile(fullpath string, runes []rune) error {
 type OrgRoamExporter struct{}
 
 func (e *OrgRoamExporter) Name() string {
-	return "orgroam"
+	return "org-roam"
 }
 
 func (e *OrgRoamExporter) Export(cfg *config.Config, book *model.Book) error {
