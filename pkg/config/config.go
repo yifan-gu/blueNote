@@ -21,8 +21,7 @@ type Config struct {
 	Parser   string
 	Exporter string
 
-	SplitBook    bool
-	RoamDir      string
+	SplitBook bool
 	AuthorSubDir bool
 
 	UpdateRoamDB bool
@@ -37,7 +36,6 @@ type Config struct {
 }
 
 const (
-	DefaultRoamDir      = "~/org/roam"
 	DefaultRoamDBPath   = "~/.emacs.d/.local/etc/org-roam.db"
 	DefaultParser       = "kindlehtml" // TODO(yifan): Refactor the config defaults
 	DefaultExporter     = "org-roam"   // TODO(yifan): Refactor the config defaults
@@ -47,7 +45,6 @@ const (
 
 func LoadConfig(cfgFile string, cfg *Config, cmd *cobra.Command) error {
 	viper.BindPFlag("SPLIT_BOOK", cmd.PersistentFlags().Lookup("split"))
-	viper.BindPFlag("ROAM_DIR", cmd.PersistentFlags().Lookup("roam-dir"))
 	viper.BindPFlag("AUTHOR_SUBDIR", cmd.PersistentFlags().Lookup("author-sub-dir"))
 
 	viper.BindPFlag("UPDATE_ROAM_DB", cmd.PersistentFlags().Lookup("update-roam-db"))
@@ -74,7 +71,6 @@ func LoadConfig(cfgFile string, cfg *Config, cmd *cobra.Command) error {
 	}
 
 	cfg.SplitBook = viper.GetBool("SPLIT_BOOK")
-	cfg.RoamDir = viper.GetString("ROAM_DIR")
 	cfg.AuthorSubDir = viper.GetBool("AUTHOR_SUBDIR")
 
 	cfg.UpdateRoamDB = viper.GetBool("UPDATE_ROAM_DB")

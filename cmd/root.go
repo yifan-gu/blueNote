@@ -71,7 +71,6 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "path to the config file, the command line parameters will override the config files if both are provided")
 
 	rootCmd.PersistentFlags().BoolVarP(&cfg.SplitBook, "split", "s", false, "split sub-sections into separate books")
-	rootCmd.PersistentFlags().StringVarP(&cfg.RoamDir, "roam-dir", "r", config.DefaultRoamDir, "path to the org-roam directory")
 	rootCmd.PersistentFlags().BoolVarP(&cfg.AuthorSubDir, "author-sub-dir", "a", true, "create sub-directory with the name of the author")
 
 	rootCmd.PersistentFlags().BoolVar(&cfg.UpdateRoamDB, "update-roam-db", false, "automatically update the roam sqlite db for links")
