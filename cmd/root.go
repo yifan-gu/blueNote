@@ -46,6 +46,13 @@ func run(cmd *cobra.Command, args []string) {
 		log.Fatal(err)
 	}
 
+	if cfg.Author != "" {
+		book.Author = cfg.Author
+	}
+	if cfg.Title != "" {
+		book.Title = cfg.Title
+	}
+
 	books := []*model.Book{book}
 	if cfg.SplitBook {
 		books = book.Split()
@@ -61,6 +68,9 @@ func run(cmd *cobra.Command, args []string) {
 func init() {
 	rootCmd.PersistentFlags().BoolVarP(&cfg.SplitBook, "split", "s", false, "split sub-sections into separate books")
 	rootCmd.PersistentFlags().BoolVarP(&cfg.AuthorSubDir, "author-sub-dir", "a", true, "create sub-directory with the name of the author")
+
+	rootCmd.PersistentFlags().StringVar(&cfg.Author, "author", "", "override the book author name")
+	rootCmd.PersistentFlags().StringVar(&cfg.Title, "title", "", "override the book title name")
 
 	rootCmd.PersistentFlags().StringVarP(&cfg.Parser, "parser", "i", config.DefaultParser, "the parser to use")
 	rootCmd.PersistentFlags().StringVarP(&cfg.Exporter, "exporter", "o", config.DefaultExporter, "the exporter to use")

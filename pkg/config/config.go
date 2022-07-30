@@ -17,6 +17,9 @@ type Config struct {
 	Parser   string
 	Exporter string
 
+	Author string
+	Title  string
+
 	SplitBook    bool
 	AuthorSubDir bool
 

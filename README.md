@@ -56,7 +56,7 @@ Parser:
 - [ ] Fix user notes content
 - [ ] Marshal and unmarshal json
 - [ ] Stacktrace error
-- [ ] Optional author, title flag
+- [x] Optional author, title flag
 
 Web/App:
 - [ ] Database storage
