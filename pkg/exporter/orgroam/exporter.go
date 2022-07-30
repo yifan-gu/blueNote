@@ -54,12 +54,13 @@ func (l Location) String() string {
 }
 
 type Mark struct {
-	Type     string
-	Section  string
-	Location Location
-	Data     string
-	Pos      int
-	UUID     uuid.UUID
+	Type      string
+	Section   string
+	Location  Location
+	Data      string
+	UserNotes string
+	Pos       int
+	UUID      uuid.UUID
 }
 
 type Book struct {
@@ -76,9 +77,10 @@ func convertFromModelBook(book *model.Book) *Book {
 	}
 	for _, mk := range book.Marks {
 		mark := Mark{
-			Type:    model.MarkTypeString[mk.Type],
-			Section: mk.Section,
-			Data:    mk.Data,
+			Type:      model.MarkTypeString[mk.Type],
+			Section:   mk.Section,
+			Data:      mk.Data,
+			UserNotes: mk.UserNotes,
 			Location: Location{
 				Chapter:  mk.Location.Chapter,
 				Page:     mk.Location.Page,

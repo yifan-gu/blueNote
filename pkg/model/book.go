@@ -30,10 +30,11 @@ type Location struct {
 
 // Mark defines the details of a mark object.
 type Mark struct {
-	Type     MarkType
-	Section  string
-	Location Location
-	Data     string
+	Type      MarkType
+	Section   string
+	Location  Location
+	Data      string
+	UserNotes string
 }
 
 // Book defines the details of a Book object, which also contains a list of marks.
@@ -60,10 +61,11 @@ func (b *Book) Split() []*Book {
 				sectionTitles = append(sectionTitles, mk.Section)
 			}
 			sectionMap[mk.Section] = append(sectionMap[mk.Section], Mark{
-				Type:     mk.Type,
-				Section:  mk.Location.Chapter,
-				Location: loc,
-				Data:     mk.Data,
+				Type:      mk.Type,
+				Section:   mk.Location.Chapter,
+				Location:  loc,
+				Data:      mk.Data,
+				UserNotes: mk.UserNotes,
 			})
 		}
 	}

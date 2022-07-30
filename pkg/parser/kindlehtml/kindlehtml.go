@@ -175,7 +175,8 @@ func handleNote(tokenizer *html.Tokenizer, book *model.Book, section string) {
 	}
 
 	handleNextText(tokenizer, func(tokenizer *html.Tokenizer) {
-		mk.Data = string(tokenizer.Raw())
+		mk.Data = book.Marks[len(book.Marks)-1].Data
+		mk.UserNotes = string(tokenizer.Raw())
 	})
 	book.Marks = append(book.Marks, mk)
 }

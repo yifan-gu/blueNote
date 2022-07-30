@@ -53,7 +53,7 @@ Parser:
 - [x] Refactor book module
 - [x] Refactor configs for parser and exporter
 - [x] Fix location output
-- [ ] Fix user notes content
+- [x] Fix user notes content
 - [ ] Marshal and unmarshal json
 - [ ] Stacktrace error
 - [x] Optional author, title flag
