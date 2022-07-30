@@ -15,6 +15,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/spf13/cobra"
 	"github.com/yifan-gu/blueNote/pkg/model"
 	"golang.org/x/net/html"
 )
@@ -24,8 +25,10 @@ var numberRegexp = regexp.MustCompile(`\d+`)
 type KindleHTMLParser struct{}
 
 func (p *KindleHTMLParser) Name() string {
-	return "kindlehtml"
+	return "kindle-html"
 }
+
+func (p *KindleHTMLParser) LoadConfigs(cmd *cobra.Command) {}
 
 func (p *KindleHTMLParser) Parse(inputPath string) (*model.Book, error) {
 	f, err := os.Open(inputPath)

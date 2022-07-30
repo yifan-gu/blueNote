@@ -10,6 +10,7 @@ import (
 	"log"
 	"strings"
 
+	"github.com/spf13/cobra"
 	"github.com/yifan-gu/blueNote/pkg/config"
 	"github.com/yifan-gu/blueNote/pkg/model"
 )
@@ -18,6 +19,7 @@ var registeredExporters map[string]Exporter
 
 type Exporter interface {
 	Name() string
+	LoadConfigs(cmd *cobra.Command)
 	Export(cfg *config.Config, book *model.Book) error
 }
 
@@ -39,4 +41,10 @@ func GetExporter(name string) Exporter {
 		log.Fatal(fmt.Errorf("unrecognized exporter type: %q", name))
 	}
 	return exporter
+}
+
+func LoadConfigs(cmd *cobra.Command) {
+	for _, exporter := range registeredExporters {
+		exporter.LoadConfigs(cmd)
+	}
 }

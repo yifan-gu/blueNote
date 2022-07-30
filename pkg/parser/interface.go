@@ -10,6 +10,7 @@ import (
 	"log"
 	"strings"
 
+	"github.com/spf13/cobra"
 	"github.com/yifan-gu/blueNote/pkg/model"
 )
 
@@ -17,6 +18,7 @@ var registeredParsers map[string]Parser
 
 type Parser interface {
 	Name() string
+	LoadConfigs(cmd *cobra.Command)
 	Parse(inputPath string) (*model.Book, error)
 }
 
@@ -38,4 +40,10 @@ func GetParser(name string) Parser {
 		log.Fatal(fmt.Errorf("unrecognized parser type: %q", name))
 	}
 	return parser
+}
+
+func LoadConfigs(cmd *cobra.Command) {
+	for _, parser := range registeredParsers {
+		parser.LoadConfigs(cmd)
+	}
 }

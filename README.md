@@ -51,7 +51,7 @@ Emacs org roam related:
 
 Parser:
 - [x] Refactor book module
-- [ ] Refactor configs for parser and exporter
+- [x] Refactor configs for parser and exporter
 - [x] Fix location output
 - [ ] Fix user notes content
 - [ ] Marshal and unmarshal json
