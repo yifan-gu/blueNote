@@ -80,7 +80,7 @@ func convertFromModelBook(book *model.Book) *Book {
 	return bk
 }
 
-func generateOutputPath(b *Book, cfg *config.Config) string {
+func generateOutputPath(b *Book, cfg *config.GlobalConfig) string {
 	filename := fmt.Sprintf("《%s》 by %s.org", b.Title, b.Author)
 	if cfg.AuthorSubDir {
 		return filepath.Join(cfg.OutputDir, b.Author, filename)
@@ -127,8 +127,7 @@ func (e *OrgRoamExporter) LoadConfigs(cmd *cobra.Command) {
 	cmd.PersistentFlags().IntVar(&e.templateType, "org-roam.template-type", defaultTemplateType, "the type of the template to use")
 }
 
-func (e *OrgRoamExporter) Export(cfg *config.
-	Config, book *model.Book) error {
+func (e *OrgRoamExporter) Export(cfg *config.GlobalConfig, book *model.Book) error {
 	bk := convertFromModelBook(book)
 
 	sq, err := db.NewSqlInterface(e.roamDBPath, e.dbDriver)
@@ -187,7 +186,7 @@ func (e *OrgRoamExporter) Export(cfg *config.
 	return nil
 }
 
-func (e *OrgRoamExporter) exportOrgRoam(b *Book, sp SqlPlanner, cfg *config.Config) ([]byte, error) {
+func (e *OrgRoamExporter) exportOrgRoam(b *Book, sp SqlPlanner, cfg *config.GlobalConfig) ([]byte, error) {
 	var orgTitleTpl, orgEntryTpl string
 	if e.templateType < 0 || e.templateType > len(OrgTemplates) {
 

@@ -15,7 +15,7 @@ import (
 	"github.com/yifan-gu/blueNote/pkg/parser"
 )
 
-var cfg config.Config
+var cfg config.GlobalConfig
 
 var rootCmd = &cobra.Command{
 	Use:   "blueNote",

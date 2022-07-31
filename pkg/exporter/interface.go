@@ -20,7 +20,7 @@ var registeredExporters map[string]Exporter
 type Exporter interface {
 	Name() string
 	LoadConfigs(cmd *cobra.Command)
-	Export(cfg *config.Config, book *model.Book) error
+	Export(cfg *config.GlobalConfig, book *model.Book) error
 }
 
 func RegisterExporter(exporter Exporter) {

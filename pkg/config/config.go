@@ -10,7 +10,7 @@ const (
 	DefaultExporter = "org-roam"
 )
 
-type Config struct {
+type GlobalConfig struct {
 	InputPath string
 	OutputDir string
 
