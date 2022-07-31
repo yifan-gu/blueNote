@@ -29,11 +29,7 @@ var OrgTemplates = []OrgTemplate{
 :PROPERTIES:
 :ID:       {{ .UUID }}
 :TYPE:     {{ .Type }}
-{{- if ne .Location.Chapter "" }}
 :CHAPTER:  {{ .Location.Chapter }}
-{{- else }}
-:CHAPTER:  {{ .Section }}
-{{- end }}
 {{- if gt .Location.Page 0 }}
 :PAGE:     {{ .Location.Page }}
 {{- end }}
@@ -57,11 +53,7 @@ var OrgTemplates = []OrgTemplate{
 :ID:       {{ .UUID }}
 :END:
 {{ .Type }} @
-{{- if ne .Location.Chapter "" }}
 Chapter: {{ .Location.Chapter }}
-{{- else }}
-Chapter: {{ .Section }}
-{{- end }}
 {{ .Location }}
 `,
 	},

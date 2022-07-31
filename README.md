@@ -54,9 +54,10 @@ Parser:
 - [x] Refactor configs for parser and exporter
 - [x] Fix location output
 - [x] Fix user notes content
-- [ ] Marshal and unmarshal json
-- [ ] Stacktrace error
+- [x] JSON exporter
 - [x] Optional author, title flag
+- [ ] Stacktrace error
+- [ ] JSON parser??
 
 Web/App:
 - [ ] Database storage

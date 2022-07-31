@@ -28,16 +28,21 @@ const (
 	defaultTemplateType = 0
 )
 
-var (
-	roamCfg roamConfig
-)
+type Book struct {
+	Title  string
+	Author string
+	Marks  []Mark
+	UUID   uuid.UUID
+}
 
-type roamConfig struct {
-	updateRoamDB   bool
-	roamDBPath     string
-	dbDriver       string
-	templateType   int
-	insertRoamLink bool
+type Mark struct {
+	Type      string
+	Section   string
+	Location  Location
+	Data      string
+	UserNotes string
+	Pos       int
+	UUID      uuid.UUID
 }
 
 type Location struct {
@@ -51,23 +56,6 @@ func (l Location) String() string {
 		return fmt.Sprintf("Chapter: %s Page: %d Loc: %d", l.Chapter, l.Page, l.Location)
 	}
 	return fmt.Sprintf("Page: %d Loc: %d", l.Page, l.Location)
-}
-
-type Mark struct {
-	Type      string
-	Section   string
-	Location  Location
-	Data      string
-	UserNotes string
-	Pos       int
-	UUID      uuid.UUID
-}
-
-type Book struct {
-	Title  string
-	Author string
-	Marks  []Mark
-	UUID   uuid.UUID
 }
 
 func convertFromModelBook(book *model.Book) *Book {
@@ -90,45 +78,6 @@ func convertFromModelBook(book *model.Book) *Book {
 		bk.Marks = append(bk.Marks, mark)
 	}
 	return bk
-}
-
-func (b *Book) exportOrgRoam(sp SqlPlanner, cfg *config.Config) ([]byte, error) {
-	var orgTitleTpl, orgEntryTpl string
-	if roamCfg.templateType < 0 || roamCfg.templateType > len(OrgTemplates) {
-
-		orgTitleTpl = OrgTemplates[1].TitleTemplate
-		orgEntryTpl = OrgTemplates[1].EntryTemplate
-	}
-	orgTitleTpl = OrgTemplates[roamCfg.templateType].TitleTemplate
-	orgEntryTpl = OrgTemplates[roamCfg.templateType].EntryTemplate
-
-	b.UUID = uuid.New()
-	buf := new(bytes.Buffer)
-	titleT := template.Must(template.New("template").Parse(orgTitleTpl))
-	if err := titleT.Execute(buf, b); err != nil {
-		return nil, fmt.Errorf("failed to execute org template for title: %v", err)
-	}
-
-	outputPath := generateOutputPath(b, cfg)
-	if err := sp.InsertNodeLinkTitleEntry(b, outputPath); err != nil {
-		return nil, err
-	}
-
-	for _, mk := range b.Marks {
-		mk.UUID = uuid.New()
-		mk.Pos = len([]rune(buf.String())) + len("\n*")
-
-		if err := sp.InsertNodeLinkMarkEntry(b, &mk, outputPath); err != nil {
-			return nil, err
-		}
-
-		entryT := template.Must(template.New("template").Parse(orgEntryTpl))
-		if err := entryT.Execute(buf, mk); err != nil {
-			return nil, fmt.Errorf("failed to execute org template for entries: %v", err)
-		}
-	}
-
-	return buf.Bytes(), nil
 }
 
 func generateOutputPath(b *Book, cfg *config.Config) string {
@@ -158,24 +107,31 @@ func writeRunesToFile(fullpath string, runes []rune) error {
 	return nil
 }
 
-type OrgRoamExporter struct{}
+type OrgRoamExporter struct {
+	updateRoamDB   bool
+	roamDBPath     string
+	dbDriver       string
+	templateType   int
+	insertRoamLink bool
+}
 
 func (e *OrgRoamExporter) Name() string {
 	return "org-roam"
 }
 
 func (e *OrgRoamExporter) LoadConfigs(cmd *cobra.Command) {
-	cmd.PersistentFlags().BoolVar(&roamCfg.updateRoamDB, "org-roam.update-db", false, "automatically update the roam sqlite db for links")
-	cmd.PersistentFlags().StringVarP(&roamCfg.roamDBPath, "org-roam.db-path", "d", defaultRoamDBPath, "path to the org-roam sqlite3 database")
-	cmd.PersistentFlags().StringVar(&roamCfg.dbDriver, "org-roam.db-driver", defaultSqlDriver, "the database driver to use")
-	cmd.PersistentFlags().BoolVarP(&roamCfg.insertRoamLink, "org-roam.insert-roam-link", "l", true, "insert the roam links")
-	cmd.PersistentFlags().IntVar(&roamCfg.templateType, "org-roam.template-type", defaultTemplateType, "the type of the template to use")
+	cmd.PersistentFlags().BoolVar(&e.updateRoamDB, "org-roam.update-db", false, "automatically update the roam sqlite db for links")
+	cmd.PersistentFlags().StringVarP(&e.roamDBPath, "org-roam.db-path", "d", defaultRoamDBPath, "path to the org-roam sqlite3 database")
+	cmd.PersistentFlags().StringVar(&e.dbDriver, "org-roam.db-driver", defaultSqlDriver, "the database driver to use")
+	cmd.PersistentFlags().BoolVarP(&e.insertRoamLink, "org-roam.insert-roam-link", "l", true, "insert the roam links")
+	cmd.PersistentFlags().IntVar(&e.templateType, "org-roam.template-type", defaultTemplateType, "the type of the template to use")
 }
 
-func (e *OrgRoamExporter) Export(cfg *config.Config, book *model.Book) error {
+func (e *OrgRoamExporter) Export(cfg *config.
+	Config, book *model.Book) error {
 	bk := convertFromModelBook(book)
 
-	sq, err := db.NewSqlInterface(roamCfg.roamDBPath, roamCfg.dbDriver)
+	sq, err := db.NewSqlInterface(e.roamDBPath, e.dbDriver)
 	if err != nil {
 		return err
 	}
@@ -208,8 +164,8 @@ func (e *OrgRoamExporter) Export(cfg *config.Config, book *model.Book) error {
 		}
 	}
 
-	sp := newSqlPlanner(sq, roamCfg.updateRoamDB)
-	b, err := bk.exportOrgRoam(sp, cfg)
+	sp := newSqlPlanner(sq, e.updateRoamDB)
+	b, err := e.exportOrgRoam(bk, sp, cfg)
 	if err != nil {
 		return err
 	}
@@ -229,4 +185,43 @@ func (e *OrgRoamExporter) Export(cfg *config.Config, book *model.Book) error {
 	fmt.Println("Successfully created:", fullpath)
 
 	return nil
+}
+
+func (e *OrgRoamExporter) exportOrgRoam(b *Book, sp SqlPlanner, cfg *config.Config) ([]byte, error) {
+	var orgTitleTpl, orgEntryTpl string
+	if e.templateType < 0 || e.templateType > len(OrgTemplates) {
+
+		orgTitleTpl = OrgTemplates[1].TitleTemplate
+		orgEntryTpl = OrgTemplates[1].EntryTemplate
+	}
+	orgTitleTpl = OrgTemplates[e.templateType].TitleTemplate
+	orgEntryTpl = OrgTemplates[e.templateType].EntryTemplate
+
+	b.UUID = uuid.New()
+	buf := new(bytes.Buffer)
+	titleT := template.Must(template.New("template").Parse(orgTitleTpl))
+	if err := titleT.Execute(buf, b); err != nil {
+		return nil, fmt.Errorf("failed to execute org template for title: %v", err)
+	}
+
+	outputPath := generateOutputPath(b, cfg)
+	if err := sp.InsertNodeLinkTitleEntry(b, outputPath); err != nil {
+		return nil, err
+	}
+
+	for _, mk := range b.Marks {
+		mk.UUID = uuid.New()
+		mk.Pos = len([]rune(buf.String())) + len("\n*")
+
+		if err := sp.InsertNodeLinkMarkEntry(b, &mk, outputPath); err != nil {
+			return nil, err
+		}
+
+		entryT := template.Must(template.New("template").Parse(orgEntryTpl))
+		if err := entryT.Execute(buf, mk); err != nil {
+			return nil, fmt.Errorf("failed to execute org template for entries: %v", err)
+		}
+	}
+
+	return buf.Bytes(), nil
 }

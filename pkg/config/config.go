@@ -25,4 +25,7 @@ type Config struct {
 
 	PromptYesToAll bool
 	PromptNoToAll  bool
+
+	TotalBookCnt     int
+	CurrentBookIndex int
 }

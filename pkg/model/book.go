@@ -21,11 +21,11 @@ var MarkTypeString = map[MarkType]string{
 	MarkTypeNote:      "NOTE",
 }
 
-// Location defines the location of a mark in the book.
-type Location struct {
-	Chapter  string
-	Page     int
-	Location int
+// Book defines the details of a Book object, which also contains a list of marks.
+type Book struct {
+	Title  string
+	Author string
+	Marks  []Mark
 }
 
 // Mark defines the details of a mark object.
@@ -37,11 +37,11 @@ type Mark struct {
 	UserNotes string
 }
 
-// Book defines the details of a Book object, which also contains a list of marks.
-type Book struct {
-	Title  string
-	Author string
-	Marks  []Mark
+// Location defines the location of a mark in the book.
+type Location struct {
+	Chapter  string
+	Page     int
+	Location int
 }
 
 // Split will turn a book into multiple  books.
@@ -53,17 +53,13 @@ func (b *Book) Split() []*Book {
 
 	for _, mk := range b.Marks {
 		if mk.Section != "" {
-			loc := Location{
-				Page:     mk.Location.Page,
-				Location: mk.Location.Location,
-			}
 			if _, ok := sectionMap[mk.Section]; !ok {
 				sectionTitles = append(sectionTitles, mk.Section)
 			}
 			sectionMap[mk.Section] = append(sectionMap[mk.Section], Mark{
 				Type:      mk.Type,
 				Section:   mk.Location.Chapter,
-				Location:  loc,
+				Location:  mk.Location,
 				Data:      mk.Data,
 				UserNotes: mk.UserNotes,
 			})

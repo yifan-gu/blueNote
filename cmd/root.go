@@ -57,9 +57,12 @@ func run(cmd *cobra.Command, args []string) {
 	if cfg.SplitBook {
 		books = book.Split()
 	}
+	cfg.TotalBookCnt = len(books)
 
-	for _, bk := range books {
-		if err := exporter.GetExporter(cfg.Exporter).Export(&cfg, bk); err != nil {
+	exp := exporter.GetExporter(cfg.Exporter)
+	for i, bk := range books {
+		cfg.CurrentBookIndex = i
+		if err := exp.Export(&cfg, bk); err != nil {
 			log.Fatal(err)
 		}
 	}
