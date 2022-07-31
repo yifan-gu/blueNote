@@ -36,9 +36,17 @@ func Execute() {
 }
 
 func run(cmd *cobra.Command, args []string) {
-	if len(args) < 1 || len(args) > 2 {
+	if len(args) > 2 {
 		cmd.Help()
 		os.Exit(1)
+	}
+
+	if cfg.ListParsers {
+		printParsersAndExit()
+	}
+
+	if cfg.ListExporters {
+		printExportersAndExit()
 	}
 
 	cfg.InputPath = args[0]
@@ -85,6 +93,9 @@ func run(cmd *cobra.Command, args []string) {
 }
 
 func init() {
+	rootCmd.PersistentFlags().BoolVar(&cfg.ListParsers, "list-parsers", false, "list the supported parsers")
+	rootCmd.PersistentFlags().BoolVar(&cfg.ListExporters, "list-exporters", false, "list the supported exporters")
+
 	rootCmd.PersistentFlags().BoolVarP(&cfg.SplitBook, "split", "s", false, "split sub-sections into separate books")
 	rootCmd.PersistentFlags().BoolVarP(&cfg.AuthorSubDir, "author-sub-dir", "a", true, "create sub-directory with the name of the author")
 

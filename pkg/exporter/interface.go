@@ -43,6 +43,14 @@ func GetExporter(name string) Exporter {
 	return exporter
 }
 
+func ListExporters() []string {
+	var names []string
+	for _, exporter := range registeredExporters {
+		names = append(names, exporter.Name())
+	}
+	return names
+}
+
 func LoadConfigs(cmd *cobra.Command) {
 	for _, exporter := range registeredExporters {
 		exporter.LoadConfigs(cmd)

@@ -42,6 +42,14 @@ func GetParser(name string) Parser {
 	return parser
 }
 
+func ListParsers() []string {
+	var names []string
+	for _, parser := range registeredParsers {
+		names = append(names, parser.Name())
+	}
+	return names
+}
+
 func LoadConfigs(cmd *cobra.Command) {
 	for _, parser := range registeredParsers {
 		parser.LoadConfigs(cmd)

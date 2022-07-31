@@ -11,6 +11,9 @@ const (
 )
 
 type GlobalConfig struct {
+	ListParsers   bool
+	ListExporters bool
+
 	InputPath string
 	OutputDir string
 

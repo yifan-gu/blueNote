@@ -57,6 +57,7 @@ Parser:
 - [x] JSON exporter
 - [x] Optional author, title flag
 - [x] Stacktrace error
+- [x] List parsers and exporters
 - [ ] JSON parser??
 
 Web/App:
