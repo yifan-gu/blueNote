@@ -15,6 +15,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/yifan-gu/blueNote/pkg/model"
 	"golang.org/x/net/html"
@@ -34,7 +35,7 @@ func (p *KindleHTMLParser) Parse(inputPath string) (*model.Book, error) {
 	f, err := os.Open(inputPath)
 	defer f.Close()
 	if err != nil {
-		return nil, fmt.Errorf("failed to open %q: %v", inputPath, err)
+		return nil, errors.Wrap(err, "")
 	}
 
 	buf := bufio.NewReader(f)
@@ -49,7 +50,7 @@ func (p *KindleHTMLParser) Parse(inputPath string) (*model.Book, error) {
 			if tokenizer.Err() == io.EOF {
 				break
 			}
-			return nil, fmt.Errorf("tokenize error for %q: %v", inputPath, tokenizer.Err())
+			return nil, errors.Wrap(tokenizer.Err(), fmt.Sprintf("tokenize error for %q", inputPath))
 		}
 
 		token := tokenizer.Token()
@@ -70,7 +71,7 @@ func (p *KindleHTMLParser) Parse(inputPath string) (*model.Book, error) {
 				section = strings.TrimSpace(string(tokenizer.Raw()))
 			case "noteHeading":
 				if err := handleNoteEntry(tokenizer, &book, section); err != nil {
-					return nil, fmt.Errorf("failed to handle notes for %q: %v", inputPath, err)
+					return nil, errors.Wrap(err, fmt.Sprintf("failed to handle notes for %q", inputPath))
 				}
 			}
 		}
@@ -82,7 +83,7 @@ func handleNextText(tokenizer *html.Tokenizer, f func(tokenizer *html.Tokenizer)
 	for {
 		tt := tokenizer.Next()
 		if tt == html.ErrorToken {
-			return tokenizer.Err()
+			return errors.Wrap(tokenizer.Err(), "")
 		}
 		if tokenizer.Token().Type == html.TextToken {
 			break

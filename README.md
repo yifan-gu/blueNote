@@ -56,7 +56,7 @@ Parser:
 - [x] Fix user notes content
 - [x] JSON exporter
 - [x] Optional author, title flag
-- [ ] Stacktrace error
+- [x] Stacktrace error
 - [ ] JSON parser??
 
 Web/App:

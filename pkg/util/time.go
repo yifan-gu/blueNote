@@ -8,6 +8,8 @@ package util
 import (
 	"fmt"
 	"syscall"
+
+	"github.com/pkg/errors"
 )
 
 // timespecToEmacsTimestamp converts a Timespec{Sec, Nsec} to
@@ -25,7 +27,7 @@ func timespecToEmacsTimestamp(ts syscall.Timespec) []int64 {
 func getEmacsTimestamp(path, typ string) (string, error) {
 	var st syscall.Stat_t
 	if err := syscall.Stat(path, &st); err != nil {
-		return "", err
+		return "", errors.Wrap(err, "")
 	}
 	var est []int64
 	switch typ {

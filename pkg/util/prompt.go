@@ -11,6 +11,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/pkg/errors"
 	"github.com/yifan-gu/blueNote/pkg/config"
 )
 
@@ -27,7 +28,7 @@ func PromptConfirmation(cfg *config.GlobalConfig, prompt string) (bool, error) {
 		fmt.Printf("%s [y/n/yes-to-(a)ll/n(o)ne]: ", prompt)
 		response, err := reader.ReadString('\n')
 		if err != nil {
-			return false, err
+			return false, errors.Wrap(err, "")
 		}
 
 		response = strings.ToLower(strings.TrimSpace(response))

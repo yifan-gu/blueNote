@@ -9,12 +9,14 @@ import (
 	"os/user"
 	"path/filepath"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 func ResolvePath(path string) (string, error) {
 	usr, err := user.Current()
 	if err != nil {
-		return "", err
+		return "", errors.Wrap(err, "")
 	}
 	dir := usr.HomeDir
 

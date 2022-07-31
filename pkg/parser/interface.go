@@ -7,11 +7,11 @@ package parser
 
 import (
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/yifan-gu/blueNote/pkg/model"
+	"github.com/yifan-gu/blueNote/pkg/util"
 )
 
 var registeredParsers map[string]Parser
@@ -37,7 +37,7 @@ func GetParser(name string) Parser {
 	name = strings.ToLower(name)
 	parser, ok := registeredParsers[name]
 	if !ok {
-		log.Fatal(fmt.Errorf("unrecognized parser type: %q", name))
+		util.Fatal(fmt.Errorf("unrecognized parser type: %q", name))
 	}
 	return parser
 }

@@ -5,14 +5,16 @@ Copyright © 2022 Yifan Gu <guyifan1121@gmail.com>
 package cmd
 
 import (
-	"log"
+	"fmt"
 	"os"
 
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/yifan-gu/blueNote/pkg/config"
 	"github.com/yifan-gu/blueNote/pkg/exporter"
 	"github.com/yifan-gu/blueNote/pkg/model"
 	"github.com/yifan-gu/blueNote/pkg/parser"
+	"github.com/yifan-gu/blueNote/pkg/util"
 )
 
 var cfg config.GlobalConfig
@@ -23,9 +25,13 @@ var rootCmd = &cobra.Command{
 	Run:   run,
 }
 
+type stackTracer interface {
+	StackTrace() errors.StackTrace
+}
+
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		log.Fatal(err)
+		util.Fatal(err)
 	}
 }
 
@@ -43,7 +49,12 @@ func run(cmd *cobra.Command, args []string) {
 
 	book, err := parser.GetParser(cfg.Parser).Parse(cfg.InputPath)
 	if err != nil {
-		log.Fatal(err)
+		stackTraceableErr, ok := err.(stackTracer)
+		fmt.Println(errors.Cause(err))
+		if ok {
+			fmt.Printf("%+v\n", stackTraceableErr.StackTrace())
+		}
+		os.Exit(1)
 	}
 
 	if cfg.Author != "" {
@@ -63,7 +74,12 @@ func run(cmd *cobra.Command, args []string) {
 	for i, bk := range books {
 		cfg.CurrentBookIndex = i
 		if err := exp.Export(&cfg, bk); err != nil {
-			log.Fatal(err)
+			fmt.Println(errors.Cause(err))
+			stackTraceableErr, ok := err.(stackTracer)
+			if ok {
+				fmt.Printf("%+v\n", stackTraceableErr.StackTrace())
+			}
+			os.Exit(1)
 		}
 	}
 }

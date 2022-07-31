@@ -14,6 +14,7 @@ import (
 	"text/template"
 
 	"github.com/google/uuid"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
 	"github.com/yifan-gu/blueNote/pkg/config"
@@ -91,7 +92,7 @@ func generateOutputPath(b *Book, cfg *config.GlobalConfig) string {
 func writeRunesToFile(fullpath string, runes []rune) error {
 	f, err := os.OpenFile(fullpath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
-		return fmt.Errorf("failed to open or create file %s: %v", fullpath, err)
+		return errors.Wrap(err, fmt.Sprintf("failed to open or create file %s", fullpath))
 	}
 	defer f.Close()
 
@@ -101,7 +102,7 @@ func writeRunesToFile(fullpath string, runes []rune) error {
 	for i := range runes {
 		_, err = fmt.Fprintf(buf, "%c", runes[i])
 		if err != nil {
-			return fmt.Errorf("failed to write to file %s: %v", fullpath, err)
+			return errors.Wrap(err, fmt.Sprintf("failed to write to file %s", fullpath))
 		}
 	}
 	return nil
@@ -148,7 +149,7 @@ func (e *OrgRoamExporter) Export(cfg *config.GlobalConfig, book *model.Book) err
 		}
 		if confirm {
 			if err := os.MkdirAll(dir, 0755); err != nil {
-				return fmt.Errorf("failed to create dir %q: %v", dir, err)
+				return errors.Wrap(err, fmt.Sprintf("failed to create dir %q"))
 			}
 		}
 	}

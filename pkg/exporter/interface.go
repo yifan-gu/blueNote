@@ -7,12 +7,12 @@ package exporter
 
 import (
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/yifan-gu/blueNote/pkg/config"
 	"github.com/yifan-gu/blueNote/pkg/model"
+	"github.com/yifan-gu/blueNote/pkg/util"
 )
 
 var registeredExporters map[string]Exporter
@@ -38,7 +38,7 @@ func GetExporter(name string) Exporter {
 	name = strings.ToLower(name)
 	exporter, ok := registeredExporters[name]
 	if !ok {
-		log.Fatal(fmt.Errorf("unrecognized exporter type: %q", name))
+		util.Fatal(fmt.Errorf("unrecognized exporter type: %q", name))
 	}
 	return exporter
 }

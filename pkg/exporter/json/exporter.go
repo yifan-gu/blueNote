@@ -9,6 +9,7 @@ import (
 	jsonenc "encoding/json"
 	"fmt"
 
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/yifan-gu/blueNote/pkg/config"
 	"github.com/yifan-gu/blueNote/pkg/model"
@@ -99,7 +100,7 @@ func (e *JSONExporter) exportSingleBook(bk *Book) error {
 		b, err = jsonenc.Marshal(bk)
 	}
 	if err != nil {
-		return fmt.Errorf("failed to marshal json: %v", err)
+		return errors.Wrap(err, "failed to marshal json")
 	}
 	fmt.Println(string(b))
 	return nil
@@ -114,7 +115,7 @@ func (e *JSONExporter) exportMultipleBooks(books []Book) error {
 		b, err = jsonenc.Marshal(books)
 	}
 	if err != nil {
-		return fmt.Errorf("failed to marshal json: %v", err)
+		return errors.Wrap(err, "failed to marshal json")
 	}
 	fmt.Println(string(b))
 	return nil

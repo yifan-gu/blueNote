@@ -14,6 +14,7 @@ import (
 	"path/filepath"
 	"text/template"
 
+	"github.com/pkg/errors"
 	"github.com/yifan-gu/blueNote/pkg/exporter/orgroam/db"
 	"github.com/yifan-gu/blueNote/pkg/util"
 )
@@ -70,13 +71,13 @@ func (s *sqlPlanner) InsertFileEntry(book *Book, fullpath string) error {
 func computeHash(fullpath string) (string, error) {
 	f, err := os.Open(fullpath)
 	if err != nil {
-		return "", err
+		return "", errors.Wrap(err, "")
 	}
 	defer f.Close()
 
 	h := sha1.New()
 	if _, err := io.Copy(h, f); err != nil {
-		return "", err
+		return "", errors.Wrap(err, "")
 	}
 	return fmt.Sprintf("%x", h.Sum(nil)), nil
 }
@@ -93,7 +94,7 @@ func (s *sqlPlanner) insertNodeLinkEntry(book *Book, outputPath, uuid, data stri
 
 	fullpath, err := util.ResolvePath(outputPath)
 	if err != nil {
-		return fmt.Errorf("failed to get full path of %s: %v", outputPath, err)
+		return err
 	}
 
 	s.sqls = append(s.sqls, &db.SQL{
@@ -118,7 +119,7 @@ func generateProperties(book *Book, uuid, outputPath, data string) (string, erro
 
 	fullpath, err := util.ResolvePath(outputPath)
 	if err != nil {
-		return "", fmt.Errorf("failed to get full path of %s: %v", outputPath, err)
+		return "", err
 	}
 
 	v := struct {
@@ -145,7 +146,7 @@ func generateProperties(book *Book, uuid, outputPath, data string) (string, erro
 	buf := new(bytes.Buffer)
 	tpl := template.Must(template.New("template").Parse(propertyTpl))
 	if err := tpl.Execute(buf, &v); err != nil {
-		return "", fmt.Errorf("failed to execute peroperty template: %v", err)
+		return "", errors.Wrap(err, "failed to execute property template")
 	}
 
 	return buf.String(), nil
