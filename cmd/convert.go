@@ -37,12 +37,15 @@ func runConvert(cmd *cobra.Command, args []string) {
 		printExportersAndExit()
 	}
 
-	if len(args) == 0 {
-		cmd.Help()
-		os.Exit(1)
+	if len(args) != 0 {
+		cfg.InputPath = args[0]
+	} else {
+		if cfg.Parser != "json" {
+			cmd.Help()
+			os.Exit(1)
+		}
 	}
 
-	cfg.InputPath = args[0]
 	cfg.OutputDir = "./"
 	if len(args) == 2 {
 		cfg.OutputDir = args[1]

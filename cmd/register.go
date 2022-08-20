@@ -4,20 +4,22 @@ import (
 	"os"
 
 	"github.com/yifan-gu/blueNote/pkg/exporter"
-	"github.com/yifan-gu/blueNote/pkg/exporter/json"
+	jsonexporter "github.com/yifan-gu/blueNote/pkg/exporter/json"
 	"github.com/yifan-gu/blueNote/pkg/exporter/orgroam"
 	"github.com/yifan-gu/blueNote/pkg/parser"
+	jsonparser "github.com/yifan-gu/blueNote/pkg/parser/json"
 	"github.com/yifan-gu/blueNote/pkg/parser/kindlehtml"
 	"github.com/yifan-gu/blueNote/pkg/util"
 )
 
 func registerParsers() {
 	parser.RegisterParser(&kindlehtml.KindleHTMLParser{})
+	parser.RegisterParser(&jsonparser.JSONParser{})
 }
 
 func registerExporters() {
 	exporter.RegisterExporter(&orgroam.OrgRoamExporter{})
-	exporter.RegisterExporter(&json.JSONExporter{})
+	exporter.RegisterExporter(&jsonexporter.JSONExporter{})
 }
 
 func printParsersAndExit() {

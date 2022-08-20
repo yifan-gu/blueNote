@@ -59,7 +59,7 @@ Parser/Exporter:
 - [x] Stacktrace error
 - [x] List parsers and exporters
 - [ ] MongoDB exporter
-- [ ] JSON parser??
+- [x] JSON parser??
 
 Web/App:
 - [ ] Database storage
