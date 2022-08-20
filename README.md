@@ -1,6 +1,6 @@
 blueNote
 ============
-Organize reading notes and clippings
+A Reading Notes/Clippings Browser
 
 
 ## Build
@@ -49,7 +49,7 @@ Emacs org roam related:
 - [ ] Roam module (fix bug)
 - [ ] Check roam version
 
-Parser:
+Parser/Exporter:
 - [x] Refactor book module
 - [x] Refactor configs for parser and exporter
 - [x] Fix location output
@@ -58,10 +58,12 @@ Parser:
 - [x] Optional author, title flag
 - [x] Stacktrace error
 - [x] List parsers and exporters
+- [ ] MongoDB exporter
 - [ ] JSON parser??
 
 Web/App:
 - [ ] Database storage
+- [ ] server REST API
 - [ ] Search by tags, keywords, book, author
 - [ ] Show random notes/highlights every time
 - [ ] Show connected notes
