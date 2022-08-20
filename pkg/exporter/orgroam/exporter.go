@@ -122,15 +122,16 @@ func (e *OrgRoamExporter) LoadConfigs(cmd *cobra.Command) {
 	cmd.PersistentFlags().BoolVar(&e.authorSubDir, "org-roam.author-subdir", true, "create sub-directory with the name of the author")
 }
 
-func (e *OrgRoamExporter) generateOutputPath(b *Book, cfg *config.ConvertConfig) string {
-	filename := fmt.Sprintf("《%s》 by %s.org", b.Title, b.Author)
-	if e.authorSubDir {
-		return filepath.Join(cfg.OutputDir, b.Author, filename)
+func (e *OrgRoamExporter) Export(cfg *config.ConvertConfig, books []*model.Book) error {
+	for _, bk := range books {
+		if err := e.exportBook(cfg, bk); err != nil {
+			return errors.Wrap(err, "")
+		}
 	}
-	return filepath.Join(cfg.OutputDir, filename)
+	return nil
 }
 
-func (e *OrgRoamExporter) Export(cfg *config.ConvertConfig, book *model.Book) error {
+func (e *OrgRoamExporter) exportBook(cfg *config.ConvertConfig, book *model.Book) error {
 	bk := convertFromModelBook(book)
 
 	sq, err := db.NewSqlInterface(e.roamDBPath, e.dbDriver)
@@ -187,6 +188,14 @@ func (e *OrgRoamExporter) Export(cfg *config.ConvertConfig, book *model.Book) er
 	fmt.Println("Successfully created:", fullpath)
 
 	return nil
+}
+
+func (e *OrgRoamExporter) generateOutputPath(b *Book, cfg *config.ConvertConfig) string {
+	filename := fmt.Sprintf("《%s》 by %s.org", b.Title, b.Author)
+	if e.authorSubDir {
+		return filepath.Join(cfg.OutputDir, b.Author, filename)
+	}
+	return filepath.Join(cfg.OutputDir, filename)
 }
 
 func (e *OrgRoamExporter) exportOrgRoam(b *Book, sp SqlPlanner, cfg *config.ConvertConfig) ([]byte, error) {

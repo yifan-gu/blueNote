@@ -19,7 +19,7 @@ var registeredParsers map[string]Parser
 type Parser interface {
 	Name() string
 	LoadConfigs(cmd *cobra.Command)
-	Parse(inputPath string) (*model.Book, error)
+	Parse(inputPath string) ([]*model.Book, error)
 }
 
 func RegisterParser(parser Parser) {

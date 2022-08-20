@@ -43,39 +43,3 @@ type Location struct {
 	Page     int
 	Location int
 }
-
-// Split will turn a book into multiple  books.
-// It's useful when an e-book is a collection.
-func (b *Book) Split() []*Book {
-	var books []*Book
-	var sectionTitles []string
-	sectionMap := make(map[string][]Mark)
-
-	for _, mk := range b.Marks {
-		if mk.Section != "" {
-			if _, ok := sectionMap[mk.Section]; !ok {
-				sectionTitles = append(sectionTitles, mk.Section)
-			}
-			sectionMap[mk.Section] = append(sectionMap[mk.Section], Mark{
-				Type:      mk.Type,
-				Section:   mk.Location.Chapter,
-				Location:  mk.Location,
-				Data:      mk.Data,
-				UserNotes: mk.UserNotes,
-			})
-		}
-	}
-
-	for _, sectionTitle := range sectionTitles {
-		books = append(books, &Book{
-			Title:  sectionTitle,
-			Author: b.Author,
-			Marks:  sectionMap[sectionTitle],
-		})
-	}
-	if len(books) == 0 {
-		books = []*Book{b}
-	}
-
-	return books
-}

@@ -39,7 +39,7 @@ func (p *KindleHTMLParser) LoadConfigs(cmd *cobra.Command) {
 	cmd.PersistentFlags().BoolVarP(&p.splitBook, "kindlehtml.split", "s", false, "split sub-sections into separate books")
 }
 
-func (p *KindleHTMLParser) Parse(inputPath string) (*model.Book, error) {
+func (p *KindleHTMLParser) Parse(inputPath string) ([]*model.Book, error) {
 	f, err := os.Open(inputPath)
 	defer f.Close()
 	if err != nil {
@@ -84,7 +84,52 @@ func (p *KindleHTMLParser) Parse(inputPath string) (*model.Book, error) {
 			}
 		}
 	}
-	return &book, nil
+	if p.author != "" {
+		book.Author = p.author
+	}
+	if p.title != "" {
+		book.Title = p.title
+	}
+	if p.splitBook {
+		return splitBook(&book), nil
+	}
+	return []*model.Book{&book}, nil
+}
+
+// splitBook will turn a book into multiple  books.
+// It's useful when the input is a book collection.
+func splitBook(bk *model.Book) []*model.Book {
+	var books []*model.Book
+	var sectionTitles []string
+	sectionMap := make(map[string][]model.Mark)
+
+	for _, mk := range bk.Marks {
+		if mk.Section != "" {
+			if _, ok := sectionMap[mk.Section]; !ok {
+				sectionTitles = append(sectionTitles, mk.Section)
+			}
+			sectionMap[mk.Section] = append(sectionMap[mk.Section], model.Mark{
+				Type:      mk.Type,
+				Section:   mk.Location.Chapter,
+				Location:  mk.Location,
+				Data:      mk.Data,
+				UserNotes: mk.UserNotes,
+			})
+		}
+	}
+
+	for _, sectionTitle := range sectionTitles {
+		books = append(books, &model.Book{
+			Title:  sectionTitle,
+			Author: bk.Author,
+			Marks:  sectionMap[sectionTitle],
+		})
+	}
+	if len(books) == 0 {
+		books = []*model.Book{bk}
+	}
+
+	return books
 }
 
 func handleNextText(tokenizer *html.Tokenizer, f func(tokenizer *html.Tokenizer)) error {

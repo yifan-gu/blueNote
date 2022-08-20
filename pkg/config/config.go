@@ -28,7 +28,4 @@ type ConvertConfig struct {
 
 	PromptYesToAll bool
 	PromptNoToAll  bool
-
-	TotalBookCnt     int
-	CurrentBookIndex int
 }

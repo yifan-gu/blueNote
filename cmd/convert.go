@@ -12,7 +12,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/yifan-gu/blueNote/pkg/config"
 	"github.com/yifan-gu/blueNote/pkg/exporter"
-	"github.com/yifan-gu/blueNote/pkg/model"
 	"github.com/yifan-gu/blueNote/pkg/parser"
 )
 
@@ -44,7 +43,7 @@ func runConvert(cmd *cobra.Command, args []string) {
 		cfg.OutputDir = args[1]
 	}
 
-	book, err := parser.GetParser(cfg.Parser).Parse(cfg.InputPath)
+	books, err := parser.GetParser(cfg.Parser).Parse(cfg.InputPath)
 	if err != nil {
 		stackTraceableErr, ok := err.(stackTracer)
 		fmt.Println(errors.Cause(err))
@@ -54,30 +53,14 @@ func runConvert(cmd *cobra.Command, args []string) {
 		os.Exit(1)
 	}
 
-	if cfg.Author != "" {
-		book.Author = cfg.Author
-	}
-	if cfg.Title != "" {
-		book.Title = cfg.Title
-	}
-
-	books := []*model.Book{book}
-	if cfg.SplitBook {
-		books = book.Split()
-	}
-	cfg.TotalBookCnt = len(books)
-
 	exp := exporter.GetExporter(cfg.Exporter)
-	for i, bk := range books {
-		cfg.CurrentBookIndex = i
-		if err := exp.Export(&cfg, bk); err != nil {
-			fmt.Println(errors.Cause(err))
-			stackTraceableErr, ok := err.(stackTracer)
-			if ok {
-				fmt.Printf("%+v\n", stackTraceableErr.StackTrace())
-			}
-			os.Exit(1)
+	if err := exp.Export(&cfg, books); err != nil {
+		fmt.Println(errors.Cause(err))
+		stackTraceableErr, ok := err.(stackTracer)
+		if ok {
+			fmt.Printf("%+v\n", stackTraceableErr.StackTrace())
 		}
+		os.Exit(1)
 	}
 }
 

@@ -15,8 +15,6 @@ import (
 	"github.com/yifan-gu/blueNote/pkg/model"
 )
 
-var books []Book
-
 type Book struct {
 	Title  string `json:"title"`
 	Author string `json:"author"`
@@ -53,7 +51,18 @@ func (e *JSONExporter) LoadConfigs(cmd *cobra.Command) {
 	cmd.PersistentFlags().StringVar(&e.indent, "json.indent", "  ", "sets the json indent")
 }
 
-func (e *JSONExporter) Export(cfg *config.ConvertConfig, book *model.Book) error {
+func (e *JSONExporter) Export(cfg *config.ConvertConfig, books []*model.Book) error {
+	var ret []Book
+	for _, bk := range books {
+		ret = append(ret, e.convertBook(bk))
+	}
+	if err := e.marshalBooks(ret); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (e *JSONExporter) convertBook(book *model.Book) Book {
 	bk := Book{
 		Title:  book.Title,
 		Author: book.Author,
@@ -79,34 +88,10 @@ func (e *JSONExporter) Export(cfg *config.ConvertConfig, book *model.Book) error
 			Location:  loc,
 		})
 	}
-
-	if !cfg.SplitBook {
-		return e.exportSingleBook(&bk)
-	}
-
-	books = append(books, bk)
-	if cfg.CurrentBookIndex == cfg.TotalBookCnt-1 {
-		return e.exportMultipleBooks(books)
-	}
-	return nil
+	return bk
 }
 
-func (e *JSONExporter) exportSingleBook(bk *Book) error {
-	var b []byte
-	var err error
-	if e.prettyPrint {
-		b, err = jsonenc.MarshalIndent(bk, "", e.indent)
-	} else {
-		b, err = jsonenc.Marshal(bk)
-	}
-	if err != nil {
-		return errors.Wrap(err, "failed to marshal json")
-	}
-	fmt.Println(string(b))
-	return nil
-}
-
-func (e *JSONExporter) exportMultipleBooks(books []Book) error {
+func (e *JSONExporter) marshalBooks(books []Book) error {
 	var b []byte
 	var err error
 	if e.prettyPrint {
