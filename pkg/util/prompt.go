@@ -15,7 +15,7 @@ import (
 	"github.com/yifan-gu/blueNote/pkg/config"
 )
 
-func PromptConfirmation(cfg *config.GlobalConfig, prompt string) (bool, error) {
+func PromptExportOverrideConfirmation(cfg *config.ConvertConfig, prompt string) (bool, error) {
 	if cfg.PromptNoToAll {
 		return false, nil
 	}

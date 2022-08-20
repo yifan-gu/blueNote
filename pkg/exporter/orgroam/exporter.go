@@ -81,7 +81,7 @@ func convertFromModelBook(book *model.Book) *Book {
 	return bk
 }
 
-func generateOutputPath(b *Book, cfg *config.GlobalConfig) string {
+func generateOutputPath(b *Book, cfg *config.ConvertConfig) string {
 	filename := fmt.Sprintf("《%s》 by %s.org", b.Title, b.Author)
 	if cfg.AuthorSubDir {
 		return filepath.Join(cfg.OutputDir, b.Author, filename)
@@ -128,7 +128,7 @@ func (e *OrgRoamExporter) LoadConfigs(cmd *cobra.Command) {
 	cmd.PersistentFlags().IntVar(&e.templateType, "org-roam.template-type", defaultTemplateType, "the type of the template to use")
 }
 
-func (e *OrgRoamExporter) Export(cfg *config.GlobalConfig, book *model.Book) error {
+func (e *OrgRoamExporter) Export(cfg *config.ConvertConfig, book *model.Book) error {
 	bk := convertFromModelBook(book)
 
 	sq, err := db.NewSqlInterface(e.roamDBPath, e.dbDriver)
@@ -143,7 +143,7 @@ func (e *OrgRoamExporter) Export(cfg *config.GlobalConfig, book *model.Book) err
 	}
 	dir := filepath.Dir(fullpath)
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
-		confirm, err := util.PromptConfirmation(cfg, fmt.Sprintf("directory %s doesn't exit, create?", dir))
+		confirm, err := util.PromptExportOverrideConfirmation(cfg, fmt.Sprintf("directory %s doesn't exit, create?", dir))
 		if err != nil {
 			return err
 		}
@@ -155,7 +155,7 @@ func (e *OrgRoamExporter) Export(cfg *config.GlobalConfig, book *model.Book) err
 	}
 
 	if _, err := os.Stat(fullpath); err == nil || !os.IsNotExist(err) {
-		confirm, err := util.PromptConfirmation(cfg, fmt.Sprintf("file %s already exits, replace?", fullpath))
+		confirm, err := util.PromptExportOverrideConfirmation(cfg, fmt.Sprintf("file %s already exits, replace?", fullpath))
 		if err != nil {
 			return err
 		}
@@ -187,7 +187,7 @@ func (e *OrgRoamExporter) Export(cfg *config.GlobalConfig, book *model.Book) err
 	return nil
 }
 
-func (e *OrgRoamExporter) exportOrgRoam(b *Book, sp SqlPlanner, cfg *config.GlobalConfig) ([]byte, error) {
+func (e *OrgRoamExporter) exportOrgRoam(b *Book, sp SqlPlanner, cfg *config.ConvertConfig) ([]byte, error) {
 	var orgTitleTpl, orgEntryTpl string
 	if e.templateType < 0 || e.templateType > len(OrgTemplates) {
 

@@ -10,7 +10,7 @@ const (
 	DefaultExporter = "org-roam"
 )
 
-type GlobalConfig struct {
+type ConvertConfig struct {
 	ListParsers   bool
 	ListExporters bool
 

@@ -17,12 +17,12 @@ git clone git@github.com:yifan-gu/blueNote.git && go build
 
 #### Convert notes to org-roam files
 ```
-./blueNote -i kindlehtml -o org-roam examples/kindle_html_single_book_example.html ./
+./blueNote convert -i kindlehtml -o org-roam examples/kindle_html_single_book_example.html ./
 ```
 
 #### Add `-s` if the book is a collection of multiple books
 ```
-./blueNote -i kindlehtml -o org-roam -s examples/kindle_html_collection_example.html ./
+./blueNote convert -i kindlehtml -o org-roam -s examples/kindle_html_collection_example.html ./
 ```
 
 #### Browse and edit the notes with tags

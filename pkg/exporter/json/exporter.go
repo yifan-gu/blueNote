@@ -53,7 +53,7 @@ func (e *JSONExporter) LoadConfigs(cmd *cobra.Command) {
 	cmd.PersistentFlags().StringVar(&e.indent, "json.indent", "  ", "sets the json indent")
 }
 
-func (e *JSONExporter) Export(cfg *config.GlobalConfig, book *model.Book) error {
+func (e *JSONExporter) Export(cfg *config.ConvertConfig, book *model.Book) error {
 	bk := Book{
 		Title:  book.Title,
 		Author: book.Author,
