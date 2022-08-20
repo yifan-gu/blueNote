@@ -30,10 +30,10 @@ var OrgTemplates = []OrgTemplate{
 :ID:       {{ .UUID }}
 :TYPE:     {{ .Type }}
 :CHAPTER:  {{ .Location.Chapter }}
-{{- if gt .Location.Page 0 }}
+{{- if .Location.Page }}
 :PAGE:     {{ .Location.Page }}
 {{- end }}
-{{- if gt .Location.Location 0 }}
+{{- if .Location.Location }}
 :LOCATION: {{ .Location.Location }}
 {{- end }}
 :END:

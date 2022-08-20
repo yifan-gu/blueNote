@@ -7,7 +7,6 @@ package util
 
 import (
 	"bufio"
-	"fmt"
 	"os"
 	"strings"
 
@@ -25,7 +24,7 @@ func PromptExportOverrideConfirmation(cfg *config.ConvertConfig, prompt string) 
 
 	reader := bufio.NewReader(os.Stdin)
 	for {
-		fmt.Printf("%s [y/n/yes-to-(a)ll/n(o)ne]: ", prompt)
+		Logf("%s [y/n/yes-to-(a)ll/n(o)ne]: ", prompt)
 		response, err := reader.ReadString('\n')
 		if err != nil {
 			return false, errors.Wrap(err, "")

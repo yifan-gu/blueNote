@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/yifan-gu/blueNote/pkg/exporter"
@@ -9,6 +8,7 @@ import (
 	"github.com/yifan-gu/blueNote/pkg/exporter/orgroam"
 	"github.com/yifan-gu/blueNote/pkg/parser"
 	"github.com/yifan-gu/blueNote/pkg/parser/kindlehtml"
+	"github.com/yifan-gu/blueNote/pkg/util"
 )
 
 func registerParsers() {
@@ -22,14 +22,14 @@ func registerExporters() {
 
 func printParsersAndExit() {
 	for _, name := range parser.ListParsers() {
-		fmt.Println(name)
+		util.Log(name)
 	}
 	os.Exit(0)
 }
 
 func printExportersAndExit() {
 	for _, name := range exporter.ListExporters() {
-		fmt.Println(name)
+		util.Log(name)
 	}
 	os.Exit(0)
 }

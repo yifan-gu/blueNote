@@ -48,8 +48,8 @@ type Mark struct {
 
 type Location struct {
 	Chapter  string
-	Page     int
-	Location int
+	Page     *int
+	Location *int
 }
 
 func (l Location) String() string {
@@ -66,7 +66,7 @@ func convertFromModelBook(book *model.Book) *Book {
 	}
 	for _, mk := range book.Marks {
 		mark := Mark{
-			Type:      model.MarkTypeString[mk.Type],
+			Type:      mk.Type,
 			Section:   mk.Section,
 			Data:      mk.Data,
 			UserNotes: mk.UserNotes,
@@ -185,7 +185,7 @@ func (e *OrgRoamExporter) exportBook(cfg *config.ConvertConfig, book *model.Book
 		return err
 	}
 
-	fmt.Println("Successfully created:", fullpath)
+	util.Log("Successfully created:", fullpath)
 
 	return nil
 }

@@ -5,7 +5,6 @@ Copyright © 2022 Yifan Gu <guyifan1121@gmail.com>
 package cmd
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/pkg/errors"
@@ -13,6 +12,7 @@ import (
 	"github.com/yifan-gu/blueNote/pkg/config"
 	"github.com/yifan-gu/blueNote/pkg/exporter"
 	"github.com/yifan-gu/blueNote/pkg/parser"
+	"github.com/yifan-gu/blueNote/pkg/util"
 )
 
 var cfg config.ConvertConfig
@@ -46,19 +46,19 @@ func runConvert(cmd *cobra.Command, args []string) {
 	books, err := parser.GetParser(cfg.Parser).Parse(cfg.InputPath)
 	if err != nil {
 		stackTraceableErr, ok := err.(stackTracer)
-		fmt.Println(errors.Cause(err))
+		util.Log(errors.Cause(err))
 		if ok {
-			fmt.Printf("%+v\n", stackTraceableErr.StackTrace())
+			util.Logf("%+v\n", stackTraceableErr.StackTrace())
 		}
 		os.Exit(1)
 	}
 
 	exp := exporter.GetExporter(cfg.Exporter)
 	if err := exp.Export(&cfg, books); err != nil {
-		fmt.Println(errors.Cause(err))
+		util.Log(errors.Cause(err))
 		stackTraceableErr, ok := err.(stackTracer)
 		if ok {
-			fmt.Printf("%+v\n", stackTraceableErr.StackTrace())
+			util.Logf("%+v\n", stackTraceableErr.StackTrace())
 		}
 		os.Exit(1)
 	}

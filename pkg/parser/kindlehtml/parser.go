@@ -18,6 +18,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/yifan-gu/blueNote/pkg/model"
+	"github.com/yifan-gu/blueNote/pkg/util"
 	"golang.org/x/net/html"
 )
 
@@ -70,10 +71,18 @@ func (p *KindleHTMLParser) Parse(inputPath string) ([]*model.Book, error) {
 			switch attr.Val {
 			case "bookTitle":
 				tokenizer.Next()
-				book.Title = strings.TrimSpace(string(tokenizer.Raw()))
+				if p.title == "" {
+					book.Title = strings.TrimSpace(string(tokenizer.Raw()))
+				} else {
+					book.Title = p.title
+				}
 			case "authors":
 				tokenizer.Next()
-				book.Author = strings.Join(strings.Fields(strings.TrimSpace(string(tokenizer.Raw()))), ".")
+				if p.author == "" {
+					book.Author = strings.Join(strings.Fields(strings.TrimSpace(string(tokenizer.Raw()))), ".")
+				} else {
+					book.Author = p.author
+				}
 			case "sectionHeading":
 				tokenizer.Next()
 				section = strings.TrimSpace(string(tokenizer.Raw()))
@@ -84,12 +93,7 @@ func (p *KindleHTMLParser) Parse(inputPath string) ([]*model.Book, error) {
 			}
 		}
 	}
-	if p.author != "" {
-		book.Author = p.author
-	}
-	if p.title != "" {
-		book.Title = p.title
-	}
+
 	if p.splitBook {
 		return splitBook(&book), nil
 	}
@@ -110,6 +114,8 @@ func splitBook(bk *model.Book) []*model.Book {
 			}
 			sectionMap[mk.Section] = append(sectionMap[mk.Section], model.Mark{
 				Type:      mk.Type,
+				Title:     mk.Section,
+				Author:    bk.Author,
 				Section:   mk.Location.Chapter,
 				Location:  mk.Location,
 				Data:      mk.Data,
@@ -149,9 +155,8 @@ func handleNextText(tokenizer *html.Tokenizer, f func(tokenizer *html.Tokenizer)
 }
 
 func parseLocationWithoutChapter(data []byte) model.Location {
-	var err error
-	var pg, lc = -1, -1
 	var page, location []byte
+	var loc model.Location
 
 	pageMarker, locMarker := []byte("Page"), []byte("Location")
 	tuples := bytes.Fields(data)
@@ -165,20 +170,22 @@ func parseLocationWithoutChapter(data []byte) model.Location {
 	}
 	match := numberRegexp.FindSubmatch(page)
 	if len(match) == 1 {
-		pg, err = strconv.Atoi(string(match[0]))
+		pg, err := strconv.Atoi(string(match[0]))
 		if err != nil {
-			panic(err)
+			util.Fatal("Cannot parse page info", err)
 		}
+		loc.Page = &pg
 	}
 
 	match = numberRegexp.FindSubmatch(location)
 	if len(match) == 1 {
-		lc, err = strconv.Atoi(string(match[0]))
+		lc, err := strconv.Atoi(string(match[0]))
 		if err != nil {
-			panic(err)
+			util.Fatal("Cannot parse location info", err)
 		}
+		loc.Location = &lc
 	}
-	return model.Location{Page: pg, Location: lc}
+	return loc
 }
 
 func parseLocationWithChapter(chapterData, data []byte) model.Location {
@@ -208,6 +215,8 @@ func parseLocation(data []byte) model.Location {
 func handleHighlight(tokenizer *html.Tokenizer, book *model.Book, section string) {
 	mk := model.Mark{
 		Type:    model.MarkTypeHighlight,
+		Title:   book.Title,
+		Author:  book.Author,
 		Section: section,
 	}
 
@@ -224,6 +233,8 @@ func handleHighlight(tokenizer *html.Tokenizer, book *model.Book, section string
 func handleNote(tokenizer *html.Tokenizer, book *model.Book, section string) {
 	mk := model.Mark{
 		Type:     model.MarkTypeNote,
+		Title:    book.Title,
+		Author:   book.Author,
 		Section:  section,
 		Location: parseLocation(tokenizer.Raw()),
 	}
