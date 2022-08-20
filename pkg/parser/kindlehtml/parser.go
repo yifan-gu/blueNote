@@ -23,13 +23,21 @@ import (
 
 var numberRegexp = regexp.MustCompile(`\d+`)
 
-type KindleHTMLParser struct{}
+type KindleHTMLParser struct {
+	author    string
+	title     string
+	splitBook bool
+}
 
 func (p *KindleHTMLParser) Name() string {
 	return "kindle-html"
 }
 
-func (p *KindleHTMLParser) LoadConfigs(cmd *cobra.Command) {}
+func (p *KindleHTMLParser) LoadConfigs(cmd *cobra.Command) {
+	cmd.PersistentFlags().StringVar(&p.author, "kindlehtml.author", "", "override the book author name")
+	cmd.PersistentFlags().StringVar(&p.title, "kindlehtml.title", "", "override the book title name")
+	cmd.PersistentFlags().BoolVarP(&p.splitBook, "kindlehtml.split", "s", false, "split sub-sections into separate books")
+}
 
 func (p *KindleHTMLParser) Parse(inputPath string) (*model.Book, error) {
 	f, err := os.Open(inputPath)

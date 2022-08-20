@@ -87,12 +87,6 @@ func init() {
 	convertCmd.PersistentFlags().BoolVar(&cfg.ListParsers, "list-parsers", false, "list the supported parsers")
 	convertCmd.PersistentFlags().BoolVar(&cfg.ListExporters, "list-exporters", false, "list the supported exporters")
 
-	convertCmd.PersistentFlags().BoolVarP(&cfg.SplitBook, "split", "s", false, "split sub-sections into separate books")
-	convertCmd.PersistentFlags().BoolVarP(&cfg.AuthorSubDir, "author-sub-dir", "a", true, "create sub-directory with the name of the author")
-
-	convertCmd.PersistentFlags().StringVar(&cfg.Author, "author", "", "override the book author name")
-	convertCmd.PersistentFlags().StringVar(&cfg.Title, "title", "", "override the book title name")
-
 	convertCmd.PersistentFlags().StringVarP(&cfg.Parser, "parser", "i", config.DefaultParser, "the parser to use")
 	convertCmd.PersistentFlags().StringVarP(&cfg.Exporter, "exporter", "o", config.DefaultExporter, "the exporter to use")
 

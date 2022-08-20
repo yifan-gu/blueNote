@@ -81,14 +81,6 @@ func convertFromModelBook(book *model.Book) *Book {
 	return bk
 }
 
-func generateOutputPath(b *Book, cfg *config.ConvertConfig) string {
-	filename := fmt.Sprintf("《%s》 by %s.org", b.Title, b.Author)
-	if cfg.AuthorSubDir {
-		return filepath.Join(cfg.OutputDir, b.Author, filename)
-	}
-	return filepath.Join(cfg.OutputDir, filename)
-}
-
 func writeRunesToFile(fullpath string, runes []rune) error {
 	f, err := os.OpenFile(fullpath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
@@ -114,6 +106,7 @@ type OrgRoamExporter struct {
 	dbDriver       string
 	templateType   int
 	insertRoamLink bool
+	authorSubDir   bool
 }
 
 func (e *OrgRoamExporter) Name() string {
@@ -126,6 +119,15 @@ func (e *OrgRoamExporter) LoadConfigs(cmd *cobra.Command) {
 	cmd.PersistentFlags().StringVar(&e.dbDriver, "org-roam.db-driver", defaultSqlDriver, "the database driver to use")
 	cmd.PersistentFlags().BoolVarP(&e.insertRoamLink, "org-roam.insert-roam-link", "l", true, "insert the roam links")
 	cmd.PersistentFlags().IntVar(&e.templateType, "org-roam.template-type", defaultTemplateType, "the type of the template to use")
+	cmd.PersistentFlags().BoolVar(&e.authorSubDir, "org-roam.author-subdir", true, "create sub-directory with the name of the author")
+}
+
+func (e *OrgRoamExporter) generateOutputPath(b *Book, cfg *config.ConvertConfig) string {
+	filename := fmt.Sprintf("《%s》 by %s.org", b.Title, b.Author)
+	if e.authorSubDir {
+		return filepath.Join(cfg.OutputDir, b.Author, filename)
+	}
+	return filepath.Join(cfg.OutputDir, filename)
 }
 
 func (e *OrgRoamExporter) Export(cfg *config.ConvertConfig, book *model.Book) error {
@@ -137,7 +139,7 @@ func (e *OrgRoamExporter) Export(cfg *config.ConvertConfig, book *model.Book) er
 	}
 	defer sq.Close()
 
-	fullpath, err := util.ResolvePath(generateOutputPath(bk, cfg))
+	fullpath, err := util.ResolvePath(e.generateOutputPath(bk, cfg))
 	if err != nil {
 		return err
 	}
@@ -149,7 +151,7 @@ func (e *OrgRoamExporter) Export(cfg *config.ConvertConfig, book *model.Book) er
 		}
 		if confirm {
 			if err := os.MkdirAll(dir, 0755); err != nil {
-				return errors.Wrap(err, fmt.Sprintf("failed to create dir %q"))
+				return errors.Wrap(err, fmt.Sprintf("failed to create dir %q", dir))
 			}
 		}
 	}
@@ -204,7 +206,7 @@ func (e *OrgRoamExporter) exportOrgRoam(b *Book, sp SqlPlanner, cfg *config.Conv
 		return nil, fmt.Errorf("failed to execute org template for title: %v", err)
 	}
 
-	outputPath := generateOutputPath(b, cfg)
+	outputPath := e.generateOutputPath(b, cfg)
 	if err := sp.InsertNodeLinkTitleEntry(b, outputPath); err != nil {
 		return nil, err
 	}
