@@ -5,6 +5,7 @@ import (
 
 	"github.com/yifan-gu/blueNote/pkg/exporter"
 	jsonexporter "github.com/yifan-gu/blueNote/pkg/exporter/json"
+	"github.com/yifan-gu/blueNote/pkg/exporter/mongodb"
 	"github.com/yifan-gu/blueNote/pkg/exporter/orgroam"
 	"github.com/yifan-gu/blueNote/pkg/parser"
 	jsonparser "github.com/yifan-gu/blueNote/pkg/parser/json"
@@ -20,6 +21,7 @@ func registerParsers() {
 func registerExporters() {
 	exporter.RegisterExporter(&orgroam.OrgRoamExporter{})
 	exporter.RegisterExporter(&jsonexporter.JSONExporter{})
+	exporter.RegisterExporter(&mongodb.MongoDBExporter{})
 }
 
 func printParsersAndExit() {

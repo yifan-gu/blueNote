@@ -7,7 +7,7 @@ package config
 
 const (
 	DefaultParser   = "kindle-html"
-	DefaultExporter = "org-roam"
+	DefaultExporter = "json"
 )
 
 type ConvertConfig struct {

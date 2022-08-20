@@ -46,8 +46,8 @@ git clone git@github.com:yifan-gu/blueNote.git && go build
 ## TODO
 
 Emacs org roam related:
-- [ ] Roam module (fix bug)
-- [ ] Check roam version
+- [ ] <s>[Dropped] Roam module (fix bug)</s>
+- [ ] <s>[Dropped] Check roam version</s>
 
 Parser/Exporter:
 - [x] Refactor book module
@@ -58,11 +58,11 @@ Parser/Exporter:
 - [x] Optional author, title flag
 - [x] Stacktrace error
 - [x] List parsers and exporters
-- [ ] MongoDB exporter
-- [x] JSON parser??
+- [x] MongoDB exporter
+- [x] JSON parser
 
 Web/App:
-- [ ] Database storage
+- [x] Database storage
 - [ ] server REST API
 - [ ] Search by tags, keywords, book, author
 - [ ] Show random notes/highlights every time
