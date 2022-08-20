@@ -35,9 +35,9 @@ func (p *KindleHTMLParser) Name() string {
 }
 
 func (p *KindleHTMLParser) LoadConfigs(cmd *cobra.Command) {
-	cmd.PersistentFlags().StringVar(&p.author, "kindlehtml.author", "", "override the book author name")
-	cmd.PersistentFlags().StringVar(&p.title, "kindlehtml.title", "", "override the book title name")
-	cmd.PersistentFlags().BoolVarP(&p.splitBook, "kindlehtml.split", "s", false, "split sub-sections into separate books")
+	cmd.PersistentFlags().StringVar(&p.author, "kindle-html.author", "", "override the book author name")
+	cmd.PersistentFlags().StringVar(&p.title, "kindle-html.title", "", "override the book title name")
+	cmd.PersistentFlags().BoolVarP(&p.splitBook, "kindle-html.split", "s", false, "split sub-sections into separate books")
 }
 
 func (p *KindleHTMLParser) Parse(inputPath string) ([]*model.Book, error) {

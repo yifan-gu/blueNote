@@ -24,7 +24,7 @@ var convertCmd = &cobra.Command{
 }
 
 func runConvert(cmd *cobra.Command, args []string) {
-	if len(args) == 0 || len(args) > 2 {
+	if len(args) > 2 {
 		cmd.Help()
 		os.Exit(1)
 	}
@@ -35,6 +35,11 @@ func runConvert(cmd *cobra.Command, args []string) {
 
 	if cfg.ListExporters {
 		printExportersAndExit()
+	}
+
+	if len(args) == 0 {
+		cmd.Help()
+		os.Exit(1)
 	}
 
 	cfg.InputPath = args[0]

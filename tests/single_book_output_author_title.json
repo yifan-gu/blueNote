@@ -1,0 +1,119 @@
+[
+  {
+    "title": "The Sun Also Rises",
+    "author": "Ernest Hemingway",
+    "marks": [
+      {
+        "type": "HIGHLIGHT",
+        "title": "The Sun Also Rises",
+        "author": "Ernest Hemingway",
+        "section": "BOOK I",
+        "location": {
+          "chapter": "Chapter 1",
+          "location": 52
+        },
+        "data": "The review commenced publication in Carmel , California ,"
+      },
+      {
+        "type": "HIGHLIGHT",
+        "title": "The Sun Also Rises",
+        "author": "Ernest Hemingway",
+        "section": "BOOK I",
+        "location": {
+          "chapter": "Chapter 1",
+          "location": 52
+        },
+        "data": "Provincetown , Massachusetts ."
+      },
+      {
+        "type": "HIGHLIGHT",
+        "title": "The Sun Also Rises",
+        "author": "Ernest Hemingway",
+        "section": "BOOK I",
+        "location": {
+          "chapter": "Chapter 1",
+          "location": 61
+        },
+        "data": "changed from one of careless possession and exploitation to the absolute determination that he should marry her ."
+      },
+      {
+        "type": "HIGHLIGHT",
+        "title": "The Sun Also Rises",
+        "author": "Ernest Hemingway",
+        "section": "BOOK I",
+        "location": {
+          "chapter": "Chapter 18",
+          "location": 3031031
+        },
+        "data": "I looked strange to myself in the glass ,"
+      },
+      {
+        "type": "HIGHLIGHT",
+        "title": "The Sun Also Rises",
+        "author": "Ernest Hemingway",
+        "section": "BOOK III",
+        "location": {
+          "chapter": "Chapter 19",
+          "location": 3068068
+        },
+        "data": "Bill’s face sort of changed ."
+      },
+      {
+        "type": "HIGHLIGHT",
+        "title": "The Sun Also Rises",
+        "author": "Ernest Hemingway",
+        "section": "BOOK III",
+        "location": {
+          "chapter": "Chapter 19",
+          "location": 3120120
+        },
+        "data": "told him to take the flowers of the Pyrenees away and bring me a vieux marc ."
+      },
+      {
+        "type": "HIGHLIGHT",
+        "title": "The Sun Also Rises",
+        "author": "Ernest Hemingway",
+        "section": "BOOK III",
+        "location": {
+          "chapter": "Chapter 19",
+          "location": 3129129
+        },
+        "data": "because I did not think I would ever see him again ."
+      },
+      {
+        "type": "NOTE",
+        "title": "The Sun Also Rises",
+        "author": "Ernest Hemingway",
+        "section": "BOOK III",
+        "location": {
+          "chapter": "Note - Chapter 19",
+          "location": 3231231
+        },
+        "data": "because I did not think I would ever see him again .",
+        "notes": "第一人称的叙述"
+      },
+      {
+        "type": "HIGHLIGHT",
+        "title": "The Sun Also Rises",
+        "author": "Ernest Hemingway",
+        "section": "BOOK III",
+        "location": {
+          "chapter": "Chapter 19",
+          "location": 3232232
+        },
+        "data": "but it would give me pleasure if my bags were brought up"
+      },
+      {
+        "type": "HIGHLIGHT",
+        "title": "The Sun Also Rises",
+        "author": "Ernest Hemingway",
+        "section": "BOOK III",
+        "location": {
+          "chapter": "Chapter 19",
+          "location": 3294294
+        },
+        "data": "“ I just talk around it . You know I feel rather damned good , Jake . ”"
+      }
+    ]
+  }
+]
