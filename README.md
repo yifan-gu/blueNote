@@ -1,4 +1,4 @@
-blueNote
+blueNote ![GitHub Actions](https://github.com/yifan-gu/blueNote/actions/workflows/go.yml/badge.svg)
 ============
 A Reading Notes/Clippings Browser
 
@@ -63,7 +63,7 @@ Parser/Exporter:
 
 Web/App:
 - [x] Database storage
-- [ ] server REST API
+- [ ] Server REST API
 - [ ] Search by tags, keywords, book, author
 - [ ] Show random notes/highlights every time
 - [ ] Show connected notes
