@@ -1,3 +1,5 @@
+//go:build linux
+
 /*
 Copyright © 2022 Yifan Gu <guyifan1121@gmail.com>
 
@@ -32,9 +34,9 @@ func getEmacsTimestamp(path, typ string) (string, error) {
 	var est []int64
 	switch typ {
 	case "atime":
-		est = timespecToEmacsTimestamp(st.Atimespec)
+		est = timespecToEmacsTimestamp(st.Atim)
 	case "mtime":
-		est = timespecToEmacsTimestamp(st.Mtimespec)
+		est = timespecToEmacsTimestamp(st.Mtim)
 	default:
 		return "", fmt.Errorf("unexpected timestamp type: %q", typ)
 	}
