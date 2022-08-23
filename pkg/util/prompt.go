@@ -14,11 +14,11 @@ import (
 	"github.com/yifan-gu/blueNote/pkg/config"
 )
 
-func PromptExportOverrideConfirmation(cfg *config.ConvertConfig, prompt string) (bool, error) {
-	if cfg.PromptNoToAll {
+func PromptExportOverrideConfirmation(prompt string) (bool, error) {
+	if config.GlobalCfg.PromptNoToAll {
 		return false, nil
 	}
-	if cfg.PromptYesToAll {
+	if config.GlobalCfg.PromptYesToAll {
 		return true, nil
 	}
 
@@ -32,11 +32,11 @@ func PromptExportOverrideConfirmation(cfg *config.ConvertConfig, prompt string) 
 
 		response = strings.ToLower(strings.TrimSpace(response))
 		if response == "a" || response == "all" {
-			cfg.PromptYesToAll = true
+			config.GlobalCfg.PromptYesToAll = true
 			return true, nil
 		}
 		if response == "o" || response == "none" {
-			cfg.PromptNoToAll = true
+			config.GlobalCfg.PromptNoToAll = true
 			return false, nil
 		}
 		if response == "y" || response == "yes" {

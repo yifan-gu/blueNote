@@ -29,7 +29,7 @@ func RegisterExporter(exporter Exporter) {
 		registeredExporters = make(map[string]Exporter)
 	}
 	if _, ok := registeredExporters[name]; ok {
-		panic(fmt.Sprintf("Name conflict for exporter %q", name))
+		util.Fatal(fmt.Errorf("Name conflict for exporter %q", name))
 	}
 	registeredExporters[name] = exporter
 }

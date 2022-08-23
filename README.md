@@ -61,9 +61,15 @@ Parser/Exporter:
 - [x] MongoDB exporter
 - [x] JSON parser
 
-Web/App:
+Server Backend:
 - [x] Database storage
+- [ ] Index, unique on digest
+- [ ] Limit on return marks
+- [ ] Timestamp(created, updated)
 - [ ] Server REST API
+- [ ] Graphql API?
+
+App:
 - [ ] Search by tags, keywords, book, author
 - [ ] Show random notes/highlights every time
 - [ ] Show connected notes
@@ -74,7 +80,7 @@ Web/App:
 - [ ] Generate tags automatically
 - [ ] Connected notes suggestion
 
-User Interaction:
+Advanced functions:
 - [ ] User ratings
 - [ ] User comments?
 - [ ] User profiles

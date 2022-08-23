@@ -10,6 +10,8 @@ import (
 	"github.com/yifan-gu/blueNote/pkg/parser"
 	jsonparser "github.com/yifan-gu/blueNote/pkg/parser/json"
 	"github.com/yifan-gu/blueNote/pkg/parser/kindlehtml"
+	"github.com/yifan-gu/blueNote/pkg/storage"
+	mongodbStore "github.com/yifan-gu/blueNote/pkg/storage/mongodb"
 	"github.com/yifan-gu/blueNote/pkg/util"
 )
 
@@ -24,6 +26,10 @@ func registerExporters() {
 	exporter.RegisterExporter(&mongodb.MongoDBExporter{})
 }
 
+func registerStorages() {
+	storage.RegisterStorage(&mongodbStore.MongoDBStorage{})
+}
+
 func printParsersAndExit() {
 	for _, name := range parser.ListParsers() {
 		util.Log(name)
@@ -33,6 +39,13 @@ func printParsersAndExit() {
 
 func printExportersAndExit() {
 	for _, name := range exporter.ListExporters() {
+		util.Log(name)
+	}
+	os.Exit(0)
+}
+
+func printStoragesAndExit() {
+	for _, name := range storage.ListStorages() {
 		util.Log(name)
 	}
 	os.Exit(0)

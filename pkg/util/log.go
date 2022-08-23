@@ -8,7 +8,13 @@ package util
 import (
 	"fmt"
 	"os"
+
+	"github.com/pkg/errors"
 )
+
+type stackTracer interface {
+	StackTrace() errors.StackTrace
+}
 
 func Fatal(v ...interface{}) {
 	fmt.Println(v...)
@@ -29,4 +35,13 @@ func Error(v ...interface{}) {
 
 func Warn(v ...interface{}) {
 	fmt.Println("Warning:", fmt.Sprint(v...))
+}
+
+func StackTraceErrorAndExit(err error) {
+	stackTraceableErr, ok := err.(stackTracer)
+	Log(errors.Cause(err))
+	if ok {
+		Logf("%+v\n", stackTraceableErr.StackTrace())
+	}
+	os.Exit(1)
 }

@@ -25,9 +25,9 @@ import (
 var numberRegexp = regexp.MustCompile(`\d+`)
 
 type KindleHTMLParser struct {
-	author    string
-	title     string
-	splitBook bool
+	authorOverride string
+	titleOverride  string
+	splitBook      bool
 }
 
 func (p *KindleHTMLParser) Name() string {
@@ -35,8 +35,8 @@ func (p *KindleHTMLParser) Name() string {
 }
 
 func (p *KindleHTMLParser) LoadConfigs(cmd *cobra.Command) {
-	cmd.PersistentFlags().StringVar(&p.author, "kindle-html.author", "", "override the book author name")
-	cmd.PersistentFlags().StringVar(&p.title, "kindle-html.title", "", "override the book title name")
+	cmd.PersistentFlags().StringVar(&p.authorOverride, "kindle-html.author", "", "override the book author name")
+	cmd.PersistentFlags().StringVar(&p.titleOverride, "kindle-html.title", "", "override the book title name")
 	cmd.PersistentFlags().BoolVarP(&p.splitBook, "kindle-html.split", "s", false, "split sub-sections into separate books")
 }
 
@@ -71,17 +71,17 @@ func (p *KindleHTMLParser) Parse(inputPath string) ([]*model.Book, error) {
 			switch attr.Val {
 			case "bookTitle":
 				tokenizer.Next()
-				if p.title == "" {
-					book.Title = strings.TrimSpace(string(tokenizer.Raw()))
+				if p.titleOverride != "" {
+					book.Title = p.titleOverride
 				} else {
-					book.Title = p.title
+					book.Title = strings.TrimSpace(string(tokenizer.Raw()))
 				}
 			case "authors":
 				tokenizer.Next()
-				if p.author == "" {
-					book.Author = strings.Join(strings.Fields(strings.TrimSpace(string(tokenizer.Raw()))), ".")
+				if p.authorOverride != "" {
+					book.Author = p.authorOverride
 				} else {
-					book.Author = p.author
+					book.Author = strings.Join(strings.Fields(strings.TrimSpace(string(tokenizer.Raw()))), ".")
 				}
 			case "sectionHeading":
 				tokenizer.Next()
@@ -154,7 +154,7 @@ func handleNextText(tokenizer *html.Tokenizer, f func(tokenizer *html.Tokenizer)
 	return nil
 }
 
-func parseLocationWithoutChapter(data []byte) model.Location {
+func parseLocationWithoutChapter(data []byte) *model.Location {
 	var page, location []byte
 	var loc model.Location
 
@@ -185,10 +185,10 @@ func parseLocationWithoutChapter(data []byte) model.Location {
 		}
 		loc.Location = &lc
 	}
-	return loc
+	return &loc
 }
 
-func parseLocationWithChapter(chapterData, data []byte) model.Location {
+func parseLocationWithChapter(chapterData, data []byte) *model.Location {
 	chapter := bytes.TrimLeft(chapterData, ") -")
 	chapter = bytes.TrimSpace(chapter)
 
@@ -198,7 +198,7 @@ func parseLocationWithChapter(chapterData, data []byte) model.Location {
 	return loc
 }
 
-func parseLocation(data []byte) model.Location {
+func parseLocation(data []byte) *model.Location {
 
 	tuples := bytes.Split(data, []byte(">"))
 	switch len(tuples) {
@@ -207,9 +207,9 @@ func parseLocation(data []byte) model.Location {
 	case 2:
 		return parseLocationWithChapter(tuples[0], tuples[1])
 	default:
-		panic(fmt.Sprintf("unexpected location format: %s", data))
+		util.Fatal(fmt.Sprintf("unexpected location format: %s", data))
+		return nil
 	}
-
 }
 
 func handleHighlight(tokenizer *html.Tokenizer, book *model.Book, section string) {

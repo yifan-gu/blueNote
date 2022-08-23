@@ -28,7 +28,7 @@ func RegisterParser(parser Parser) {
 		registeredParsers = make(map[string]Parser)
 	}
 	if _, ok := registeredParsers[name]; ok {
-		panic(fmt.Sprintf("Name conflict for parser %q", name))
+		util.Fatal(fmt.Errorf("Name conflict for parser %q", name))
 	}
 	registeredParsers[name] = parser
 }

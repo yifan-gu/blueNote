@@ -146,7 +146,7 @@ func (e *OrgRoamExporter) exportBook(cfg *config.ConvertConfig, book *model.Book
 	}
 	dir := filepath.Dir(fullpath)
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
-		confirm, err := util.PromptExportOverrideConfirmation(cfg, fmt.Sprintf("directory %s doesn't exit, create?", dir))
+		confirm, err := util.PromptExportOverrideConfirmation(fmt.Sprintf("directory %s doesn't exit, create?", dir))
 		if err != nil {
 			return err
 		}
@@ -158,7 +158,7 @@ func (e *OrgRoamExporter) exportBook(cfg *config.ConvertConfig, book *model.Book
 	}
 
 	if _, err := os.Stat(fullpath); err == nil || !os.IsNotExist(err) {
-		confirm, err := util.PromptExportOverrideConfirmation(cfg, fmt.Sprintf("file %s already exits, replace?", fullpath))
+		confirm, err := util.PromptExportOverrideConfirmation(fmt.Sprintf("file %s already exits, replace?", fullpath))
 		if err != nil {
 			return err
 		}

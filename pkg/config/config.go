@@ -8,7 +8,15 @@ package config
 const (
 	DefaultParser   = "kindle-html"
 	DefaultExporter = "json"
+	DefaultStorage  = "mongodb"
 )
+
+var GlobalCfg GlobalConfig
+
+type GlobalConfig struct {
+	PromptYesToAll bool
+	PromptNoToAll  bool
+}
 
 type ConvertConfig struct {
 	ListParsers   bool
@@ -19,13 +27,12 @@ type ConvertConfig struct {
 
 	Parser   string
 	Exporter string
+}
 
-	Author string
-	Title  string
+type StorageConfig struct {
+	ListStorages bool
 
-	SplitBook    bool
-	AuthorSubDir bool
+	Storage string
 
-	PromptYesToAll bool
-	PromptNoToAll  bool
+	Filter string
 }

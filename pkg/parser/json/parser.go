@@ -16,9 +16,9 @@ import (
 )
 
 type JSONParser struct {
-	author string
-	title  string
-	stdin  bool
+	authorOverride string
+	titleOverride  string
+	stdin          bool
 }
 
 func (p *JSONParser) Name() string {
@@ -27,8 +27,8 @@ func (p *JSONParser) Name() string {
 
 func (p *JSONParser) LoadConfigs(cmd *cobra.Command) {
 	cmd.PersistentFlags().BoolVar(&p.stdin, "json.stdin", false, "Treat the input as a json object")
-	cmd.PersistentFlags().StringVar(&p.author, "json.author", "", "override the book author name")
-	cmd.PersistentFlags().StringVar(&p.title, "json.title", "", "override the book title name")
+	cmd.PersistentFlags().StringVar(&p.authorOverride, "json.author", "", "override the book author name")
+	cmd.PersistentFlags().StringVar(&p.titleOverride, "json.title", "", "override the book title name")
 }
 
 func (p *JSONParser) Parse(inputPath string) ([]*model.Book, error) {
@@ -51,19 +51,19 @@ func (p *JSONParser) Parse(inputPath string) ([]*model.Book, error) {
 		return nil, errors.Wrap(err, "")
 	}
 
-	if p.author != "" {
+	if p.authorOverride != "" {
 		for _, bk := range books {
-			bk.Author = p.author
+			bk.Author = p.authorOverride
 			for i := range bk.Marks {
-				bk.Marks[i].Author = p.author
+				bk.Marks[i].Author = p.authorOverride
 			}
 		}
 	}
-	if p.title != "" {
+	if p.titleOverride != "" {
 		for _, bk := range books {
-			bk.Title = p.title
+			bk.Title = p.titleOverride
 			for i := range bk.Marks {
-				bk.Marks[i].Title = p.title
+				bk.Marks[i].Title = p.titleOverride
 			}
 		}
 	}
