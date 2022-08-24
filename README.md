@@ -1,6 +1,6 @@
 blueNote ![GitHub Actions](https://github.com/yifan-gu/blueNote/actions/workflows/go.yml/badge.svg)
 ============
-A Reading Notes/Clippings Browser
+A Notes/Clippings Browser
 
 
 ## Build
@@ -12,7 +12,7 @@ git clone git@github.com:yifan-gu/blueNote.git && go build
 
 ## Usage
 
-#### Export notes to html with Kindle App
+#### Export notes as html using the Kindle App
 ![Export Notes From Kindle App](screenshots/export-notes-from-kindle-app.png)
 
 #### Convert notes to org-roam files
