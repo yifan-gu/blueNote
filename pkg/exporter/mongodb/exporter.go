@@ -47,7 +47,7 @@ func (e *MongoDBExporter) Export(cfg *config.ConvertConfig, books []*model.Book)
 	var totalInserted, alreadyExisted int
 	for _, book := range books {
 		for _, mark := range book.Marks {
-			mk := mark.ToPersistenMark()
+			mk := mongodb.MarkToPersistentMark(mark)
 			result, err := conn.GetMarks(ctx, bson.M{"digest": mk.Digest})
 			if err != nil {
 				return err
@@ -59,7 +59,7 @@ func (e *MongoDBExporter) Export(cfg *config.ConvertConfig, books []*model.Book)
 				alreadyExisted++
 				continue
 			}
-			if err := conn.CreateMark(ctx, mk); err != nil {
+			if err := conn.CreateMark(ctx, mark); err != nil {
 				return err
 			}
 			totalInserted++

@@ -63,7 +63,9 @@ Parser/Exporter:
 
 Server Backend:
 - [x] Database storage
-- [ ] Index, unique on digest
+- [ ] <s>Index, unique on digest</s>
+- [x] Update storage interface
+- [ ] <s>Recompute digest</s>
 - [ ] Limit on return marks
 - [ ] Timestamp(created, updated)
 - [ ] Server REST API

@@ -36,12 +36,8 @@ func runStorageDelete(cmd *cobra.Command, args []string) {
 	if storageConfig.Filter == "" {
 		util.Fatal("Missing parameters for --filter")
 	}
-	filter, err := storage.ParseFilterString(storageConfig.Filter)
-	if err != nil {
-		util.StackTraceErrorAndExit(err)
-	}
 
-	cnt, err := store.DeleteMarks(ctx, filter)
+	cnt, err := store.DeleteMarks(ctx, storageConfig.Filter)
 	if err != nil {
 		util.StackTraceErrorAndExit(err)
 	}

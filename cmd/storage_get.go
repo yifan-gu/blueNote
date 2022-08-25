@@ -37,12 +37,8 @@ func runStorageGet(cmd *cobra.Command, args []string) {
 	if storageConfig.Filter == "" {
 		util.Fatal("Missing parameters for --filter")
 	}
-	filter, err := storage.ParseFilterString(storageConfig.Filter)
-	if err != nil {
-		util.StackTraceErrorAndExit(err)
-	}
 
-	marks, err := store.GetMarks(ctx, filter)
+	marks, err := store.GetMarks(ctx, storageConfig.Filter)
 	if err != nil {
 		util.StackTraceErrorAndExit(err)
 	}

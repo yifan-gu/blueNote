@@ -105,14 +105,14 @@ func (p *KindleHTMLParser) Parse(inputPath string) ([]*model.Book, error) {
 func splitBook(bk *model.Book) []*model.Book {
 	var books []*model.Book
 	var sectionTitles []string
-	sectionMap := make(map[string][]model.Mark)
+	sectionMap := make(map[string][]*model.Mark)
 
 	for _, mk := range bk.Marks {
 		if mk.Section != "" {
 			if _, ok := sectionMap[mk.Section]; !ok {
 				sectionTitles = append(sectionTitles, mk.Section)
 			}
-			sectionMap[mk.Section] = append(sectionMap[mk.Section], model.Mark{
+			sectionMap[mk.Section] = append(sectionMap[mk.Section], &model.Mark{
 				Type:      mk.Type,
 				Title:     mk.Section,
 				Author:    bk.Author,
@@ -213,7 +213,7 @@ func parseLocation(data []byte) *model.Location {
 }
 
 func handleHighlight(tokenizer *html.Tokenizer, book *model.Book, section string) {
-	mk := model.Mark{
+	mk := &model.Mark{
 		Type:    model.MarkTypeHighlight,
 		Title:   book.Title,
 		Author:  book.Author,
@@ -231,7 +231,7 @@ func handleHighlight(tokenizer *html.Tokenizer, book *model.Book, section string
 }
 
 func handleNote(tokenizer *html.Tokenizer, book *model.Book, section string) {
-	mk := model.Mark{
+	mk := &model.Mark{
 		Type:     model.MarkTypeNote,
 		Title:    book.Title,
 		Author:   book.Author,
