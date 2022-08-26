@@ -7,15 +7,12 @@ package mongodb
 
 import (
 	"context"
-	"errors"
-	"fmt"
 
 	"github.com/spf13/cobra"
 	"github.com/yifan-gu/blueNote/pkg/config"
 	"github.com/yifan-gu/blueNote/pkg/model"
 	"github.com/yifan-gu/blueNote/pkg/storage/mongodb"
 	"github.com/yifan-gu/blueNote/pkg/util"
-	"go.mongodb.org/mongo-driver/bson"
 )
 
 type MongoDBExporter struct {
@@ -44,28 +41,18 @@ func (e *MongoDBExporter) Export(cfg *config.ConvertConfig, books []*model.Book)
 	}
 	defer conn.Close(ctx)
 
-	var totalInserted, alreadyExisted int
+	var totalInserted int
 	for _, book := range books {
 		for _, mark := range book.Marks {
-			mk := mongodb.MarkToPersistentMark(mark)
-			result, err := conn.GetMarks(ctx, bson.M{"digest": mk.Digest})
+			id, err := conn.CreateMark(ctx, mark)
 			if err != nil {
 				return err
 			}
-			if len(result) > 0 {
-				if len(result) != 1 {
-					return errors.New(fmt.Sprintf("Expecting only one result, but got %v", len(result)))
-				}
-				alreadyExisted++
-				continue
-			}
-			if err := conn.CreateMark(ctx, mark); err != nil {
-				return err
-			}
+			util.Logf("Mark created with id: %s\n", id)
 			totalInserted++
 		}
 	}
 	util.Logf("Successfully loaded to mongodb, (database: %s, collection: %s)\n", e.mongodbConfig.DBName, e.mongodbConfig.CollectionName)
-	util.Logf("Total inserted: %v, already existed: %v\n", totalInserted, alreadyExisted)
+	util.Logf("Total inserted: %v\n", totalInserted)
 	return nil
 }

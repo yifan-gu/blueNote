@@ -21,15 +21,17 @@ type Book struct {
 
 // Mark defines the details of a mark object.
 type Mark struct {
-	ID        string    `json:"id"`
-	Type      string    `json:"type"`
-	Title     string    `json:"title"`
-	Author    string    `json:"author"`
-	Section   string    `json:"section,omitempty"`
-	Location  *Location `json:"location,omitempty"`
-	Data      string    `json:"data,omitempty"`
-	UserNotes string    `json:"notes,omitempty"`
-	Tags      []string  `json:"tags,omitempty"`
+	ID             string    `json:"id,omitempty"`
+	Type           string    `json:"type"`
+	Title          string    `json:"title"`
+	Author         string    `json:"author"`
+	Section        string    `json:"section,omitempty"`
+	Location       *Location `json:"location,omitempty"`
+	Data           string    `json:"data,omitempty"`
+	UserNotes      string    `json:"notes,omitempty"`
+	Tags           []string  `json:"tags,omitempty"`
+	CreatedAt      *int64    `json:"createdAt,omitempty"`
+	LastModifiedAt *int64    `json:"lastModifiedAt,omitempty"`
 }
 
 // Location defines the location of a mark in the book.

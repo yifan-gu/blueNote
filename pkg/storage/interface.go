@@ -21,9 +21,9 @@ type Storage interface {
 	Name() string
 	LoadConfigs(cmd *cobra.Command)
 	Connect(ctx context.Context) error
-	CreateMark(ctx context.Context, mark *model.Mark) error
-	GetMarks(ctx context.Context, filter interface{}) ([]*model.Mark, error)
-	UpdateMarks(ctx context.Context, filter interface{}, update *model.Mark) (int, error)
+	CreateMark(ctx context.Context, mark *model.Mark) (id string, err error)
+	GetMarks(ctx context.Context, filter interface{}, limit int) ([]*model.Mark, error)
+	UpdateMarks(ctx context.Context, filter interface{}, update *model.Mark) (ids []string, err error)
 	UpdateOneMark(ctx context.Context, id string, update *model.Mark) error
 	DeleteMarks(ctx context.Context, filter interface{}) (int, error)
 	DeleteOneMark(ctx context.Context, id string) error

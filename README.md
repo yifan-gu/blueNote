@@ -66,8 +66,8 @@ Server Backend:
 - [ ] <s>Index, unique on digest</s>
 - [x] Update storage interface
 - [ ] <s>Recompute digest</s>
-- [ ] Limit on return marks
-- [ ] Timestamp(created, updated)
+- [x] Limit on return marks
+- [x] Timestamp(created, last modified)
 - [ ] Server REST API
 - [ ] Graphql API?
 

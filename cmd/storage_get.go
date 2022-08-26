@@ -21,6 +21,8 @@ var storageGetCmd = &cobra.Command{
 	Run:   runStorageGet,
 }
 
+var storageGetLimit int
+
 func runStorageGet(cmd *cobra.Command, args []string) {
 	ctx := context.Background()
 	if len(args) != 0 {
@@ -38,7 +40,7 @@ func runStorageGet(cmd *cobra.Command, args []string) {
 		util.Fatal("Missing parameters for --filter")
 	}
 
-	marks, err := store.GetMarks(ctx, storageConfig.Filter)
+	marks, err := store.GetMarks(ctx, storageConfig.Filter, storageGetLimit)
 	if err != nil {
 		util.StackTraceErrorAndExit(err)
 	}
@@ -51,4 +53,5 @@ func runStorageGet(cmd *cobra.Command, args []string) {
 
 func init() {
 	storageCmd.AddCommand(storageGetCmd)
+	storageGetCmd.PersistentFlags().IntVar(&storageGetLimit, "limit", 0, "set the maximum number of marks to return, set 0 or negative to return all")
 }

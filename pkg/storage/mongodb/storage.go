@@ -7,9 +7,9 @@ package mongodb
 
 import (
 	"context"
-	"crypto/sha256"
 	"encoding/json"
 	"fmt"
+	"sort"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -24,23 +24,24 @@ import (
 
 // Location defines the location of a mark in the book.
 type Location struct {
-	Chapter  string `json:"chapter,omitempty" bson:"chapter,omitempty"`
-	Page     *int   `json:"page,omitempty" bson:"page,omitempty"`
-	Location *int   `json:"location,omitempty" bson:"location,omitempty"`
+	Chapter  string `bson:"chapter,omitempty"`
+	Page     *int   `bson:"page,omitempty"`
+	Location *int   `bson:"location,omitempty"`
 }
 
 // PersistentMark defines the details of a mark object that will be stored in the databse.
 type PersistentMark struct {
-	ID        primitive.ObjectID `json:"_id" bson:"_id"`
-	Digest    string             `json:"digest" bson:"digest"`
-	Type      string             `json:"type" bson:"type"`
-	Title     string             `json:"title" bson:"title"`
-	Author    string             `json:"author" bson:"author"`
-	Section   string             `json:"section,omitempty" bson:"section,omitempty"`
-	Location  *Location          `json:"location,omitempty" bson:"location,omitempty"`
-	Data      string             `json:"data,omitempty" bson:"data,omitempty"`
-	UserNotes string             `json:"notes,omitempty" bson:"notes,omitempty"`
-	Tags      []string           `json:"tags,omitempty" bson:"tags,omitempty"`
+	ID             primitive.ObjectID `bson:"_id"`
+	Type           string             `bson:"type"`
+	Title          string             `bson:"title"`
+	Author         string             `bson:"author"`
+	Section        string             `bson:"section,omitempty"`
+	Location       *Location          `bson:"location,omitempty"`
+	Data           string             `bson:"data,omitempty"`
+	UserNotes      string             `bson:"notes,omitempty"`
+	Tags           []string           `bson:"tags,omitempty"`
+	CreatedAt      *int64             `bson:"createdAt"`
+	LastModifiedAt *int64             `bson:"lastModifiedAt"`
 }
 
 type MongoDBStorage struct {
@@ -100,21 +101,32 @@ func (s *MongoDBStorage) Connect(ctx context.Context) error {
 	return nil
 }
 
-func (s *MongoDBStorage) CreateMark(ctx context.Context, mark *model.Mark) error {
-	if _, err := s.coll.InsertOne(ctx, MarkToPersistentMark(mark)); err != nil {
-		return errors.Wrap(err, "")
+func (s *MongoDBStorage) CreateMark(ctx context.Context, mark *model.Mark) (string, error) {
+	pm, err := MarkToPersistentMark(mark)
+	if err != nil {
+		return "", err
 	}
-	return nil
+	now := util.NowUnixMilli()
+	pm.CreatedAt = &now
+	pm.LastModifiedAt = &now
+	result, err := s.coll.InsertOne(ctx, pm)
+	if err != nil {
+		return "", errors.Wrap(err, "")
+	}
+	return result.InsertedID.(primitive.ObjectID).Hex(), nil
 }
 
-func (s *MongoDBStorage) GetMarks(ctx context.Context, filter interface{}) ([]*model.Mark, error) {
+func (s *MongoDBStorage) GetMarks(ctx context.Context, filter interface{}, limit int) ([]*model.Mark, error) {
 	filterVal, err := parseFilter(filter)
 	if err != nil {
 		return nil, err
 	}
 
 	var result []*model.Mark
-	cur, err := s.coll.Find(ctx, filterVal)
+	if limit < 0 {
+		limit = 0
+	}
+	cur, err := s.coll.Find(ctx, filterVal, options.Find().SetLimit(int64(limit)))
 	if err != nil {
 		return nil, errors.Wrap(err, "")
 	}
@@ -131,25 +143,38 @@ func (s *MongoDBStorage) GetMarks(ctx context.Context, filter interface{}) ([]*m
 	return result, nil
 }
 
-func (s *MongoDBStorage) UpdateMarks(ctx context.Context, filter interface{}, update *model.Mark) (int, error) {
-	filterVal, err := parseFilter(filter)
+func (s *MongoDBStorage) UpdateMarks(ctx context.Context, filter interface{}, update *model.Mark) ([]string, error) {
+	var ids []string
+	marks, err := s.GetMarks(ctx, filter, 0)
 	if err != nil {
-		return 0, err
-	}
-	marks, err := s.GetMarks(ctx, filterVal)
-	if err != nil {
-		return 0, errors.Wrap(err, "")
+		return nil, errors.Wrap(err, "")
 	}
 	for _, mk := range marks {
-		if _, err := s.coll.UpdateByID(ctx, mk.ID, constructUpdateFromMark(update)); err != nil {
-			return 0, errors.Wrap(err, "")
+		objectID, err := primitive.ObjectIDFromHex(mk.ID)
+		if err != nil {
+			return nil, errors.Wrap(err, "")
 		}
+		if _, err := s.coll.UpdateByID(ctx, objectID, constructUpdateFromMark(mk, update)); err != nil {
+			return nil, errors.Wrap(err, "")
+		}
+		ids = append(ids, mk.ID)
 	}
-	return len(marks), nil
+	return ids, nil
 }
 
 func (s *MongoDBStorage) UpdateOneMark(ctx context.Context, id string, update *model.Mark) error {
-	if _, err := s.coll.UpdateByID(ctx, id, constructUpdateFromMark(update)); err != nil {
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return errors.Wrap(err, "")
+	}
+	marks, err := s.GetMarks(ctx, bson.M{"_id": objectID}, 0)
+	if err != nil {
+		return errors.Wrap(err, "")
+	}
+	if len(marks) != 0 {
+		return errors.New(fmt.Sprintf("Expecting 1 mark for id %q, but saw %v", id, len(marks)))
+	}
+	if _, err := s.coll.UpdateByID(ctx, id, constructUpdateFromMark(marks[0], update)); err != nil {
 		return errors.Wrap(err, "")
 	}
 	return nil
@@ -168,7 +193,11 @@ func (s *MongoDBStorage) DeleteMarks(ctx context.Context, filter interface{}) (i
 }
 
 func (s *MongoDBStorage) DeleteOneMark(ctx context.Context, id string) error {
-	result, err := s.coll.DeleteOne(ctx, bson.M{"_id": id})
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return errors.Wrap(err, "")
+	}
+	result, err := s.coll.DeleteOne(ctx, bson.M{"_id": objectID})
 	if err != nil {
 		return errors.Wrap(err, "")
 	}
@@ -218,14 +247,8 @@ func parseFilterString(filter string) (bson.M, error) {
 }
 
 // MarkToPersistentMark converts a Mark to a PersistentMark
-func MarkToPersistentMark(mark *model.Mark) *PersistentMark {
-	b, err := json.Marshal(mark)
-	if err != nil {
-		util.Fatal("cannot marshal:", err)
-	}
-	return &PersistentMark{
-		ID:      primitive.NewObjectID(),
-		Digest:  fmt.Sprintf("%x", sha256.Sum256(b)),
+func MarkToPersistentMark(mark *model.Mark) (*PersistentMark, error) {
+	ret := &PersistentMark{
 		Type:    mark.Type,
 		Title:   mark.Title,
 		Author:  mark.Author,
@@ -235,23 +258,37 @@ func MarkToPersistentMark(mark *model.Mark) *PersistentMark {
 			Page:     mark.Location.Page,
 			Location: mark.Location.Location,
 		},
-		Data:      mark.Data,
-		UserNotes: mark.UserNotes,
-		Tags:      mark.Tags,
+		Data:           mark.Data,
+		UserNotes:      mark.UserNotes,
+		Tags:           mark.Tags,
+		CreatedAt:      mark.CreatedAt,
+		LastModifiedAt: mark.LastModifiedAt,
 	}
+	if mark.ID != "" {
+		id, err := primitive.ObjectIDFromHex(mark.ID)
+		if err != nil {
+			return nil, errors.Wrap(err, "")
+		}
+		ret.ID = id
+	} else {
+		ret.ID = primitive.NewObjectID()
+	}
+	return ret, nil
 }
 
 // PersistentMarkToMark converts a PersistentMark to a Mark.
 func PersistentMarkToMark(pm *PersistentMark) *model.Mark {
 	mark := &model.Mark{
-		ID:        pm.ID.Hex(),
-		Type:      pm.Type,
-		Title:     pm.Title,
-		Author:    pm.Author,
-		Section:   pm.Section,
-		Data:      pm.Data,
-		UserNotes: pm.UserNotes,
-		Tags:      pm.Tags,
+		ID:             pm.ID.Hex(),
+		Type:           pm.Type,
+		Title:          pm.Title,
+		Author:         pm.Author,
+		Section:        pm.Section,
+		Data:           pm.Data,
+		UserNotes:      pm.UserNotes,
+		Tags:           pm.Tags,
+		CreatedAt:      pm.CreatedAt,
+		LastModifiedAt: pm.LastModifiedAt,
 	}
 	if pm.Location != nil {
 		mark.Location = &model.Location{
@@ -263,39 +300,58 @@ func PersistentMarkToMark(pm *PersistentMark) *model.Mark {
 	return mark
 }
 
-func constructUpdateFromMark(mark *model.Mark) bson.M {
-	var update bson.M
-	if mark.Type != "" {
-		update["type"] = mark.Type
+func constructUpdateFromMark(original, update *model.Mark) bson.M {
+	b := bson.M{}
+	var modified bool
+
+	if update.Type != "" && update.Type != original.Type {
+		b["type"] = update.Type
+		modified = true
 	}
-	if mark.Title != "" {
-		update["title"] = mark.Title
+	if update.Title != "" && update.Title != original.Title {
+		b["title"] = update.Title
+		modified = true
 	}
-	if mark.Author != "" {
-		update["author"] = mark.Author
+	if update.Author != "" && update.Author != original.Author {
+		b["author"] = update.Author
+		modified = true
 	}
-	if mark.Section != "" {
-		update["section"] = mark.Section
+	if update.Section != "" && update.Section != original.Section {
+		b["section"] = update.Section
+		modified = true
 	}
-	if mark.Location != nil {
-		if mark.Location.Chapter != "" {
-			update["location.chapter"] = mark.Location.Chapter
+	if update.Location != nil {
+		if update.Location.Chapter != "" && (original.Location == nil || update.Location.Chapter != original.Location.Chapter) {
+			b["location.chapter"] = update.Location.Chapter
+			modified = true
 		}
-		if mark.Location.Page != nil {
-			update["location.page"] = mark.Location.Page
+		if update.Location.Page != nil && (original.Location == nil || original.Location.Page == nil || *update.Location.Page != *original.Location.Page) {
+			b["location.page"] = update.Location.Page
+			modified = true
 		}
-		if mark.Location.Location != nil {
-			update["location.location"] = mark.Location.Location
+		if update.Location.Location != nil && (original.Location == nil || original.Location.Location == nil || *update.Location.Location != *original.Location.Location) {
+			b["location.location"] = update.Location.Location
+			modified = true
 		}
 	}
-	if mark.Data != "" {
-		update["data"] = mark.Data
+	if update.Data != "" && update.Data != original.Data {
+		b["data"] = update.Data
+		modified = true
 	}
-	if mark.UserNotes != "" {
-		update["notes"] = mark.UserNotes
+	if update.UserNotes != "" && update.UserNotes != original.UserNotes {
+		b["notes"] = update.UserNotes
+		modified = true
 	}
-	if mark.Tags != nil {
-		update["tags"] = mark.Tags
+	if update.Tags != nil {
+		sort.StringSlice(update.Tags).Sort()
+		sort.StringSlice(original.Tags).Sort()
+		if !util.StringSlicesEqual(update.Tags, original.Tags) {
+			b["tags"] = update.Tags
+			modified = true
+		}
 	}
-	return bson.M{"$set": update}
+	if modified {
+		b["lastModifiedAt"] = util.NowUnixMilli()
+	}
+	return bson.M{"$set": b}
 }
