@@ -69,7 +69,11 @@ Server Backend:
 - [x] Limit on return marks
 - [x] Timestamp(created, last modified)
 - [ ] Server REST API
-- [ ] Graphql API?
+- [ ] Graphql API READ
+- [ ] Graphql API Create
+- [ ] Graphql API Update
+- [ ] Graphql API Delete
+- [ ] Graphql null response
 
 App:
 - [ ] Search by tags, keywords, book, author

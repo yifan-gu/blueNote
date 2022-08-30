@@ -24,7 +24,7 @@ var OrgTemplates = []OrgTemplate{
 		EntryTemplate: `
 * {{ .Data }}
 {{- if eq .Type "NOTE" }}
--- "{{ .UserNotes  }}"
+-- "{{ .UserNote  }}"
 {{- end }}
 :PROPERTIES:
 :ID:       {{ .UUID }}
@@ -44,10 +44,10 @@ var OrgTemplates = []OrgTemplate{
 		EntryTemplate: `
 * {{ .Data }}
 {{- if eq .Type "NOTE" }}
--- "{{ .UserNotes  }}"
+-- "{{ .UserNote  }}"
 {{- end }}
-{{- if ne .UserNotes "" }}
--- "{{ .UserNotes  }}"
+{{- if ne .UserNote "" }}
+-- "{{ .UserNote  }}"
 {{- end }}
 :PROPERTIES:
 :ID:       {{ .UUID }}

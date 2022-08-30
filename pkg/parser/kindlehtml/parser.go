@@ -88,7 +88,7 @@ func (p *KindleHTMLParser) Parse(inputPath string) ([]*model.Book, error) {
 				section = strings.TrimSpace(string(tokenizer.Raw()))
 			case "noteHeading":
 				if err := handleNoteEntry(tokenizer, &book, section); err != nil {
-					return nil, errors.Wrap(err, fmt.Sprintf("failed to handle notes for %q", inputPath))
+					return nil, errors.Wrap(err, fmt.Sprintf("failed to handle note for %q", inputPath))
 				}
 			}
 		}
@@ -113,13 +113,13 @@ func splitBook(bk *model.Book) []*model.Book {
 				sectionTitles = append(sectionTitles, mk.Section)
 			}
 			sectionMap[mk.Section] = append(sectionMap[mk.Section], &model.Mark{
-				Type:      mk.Type,
-				Title:     mk.Section,
-				Author:    bk.Author,
-				Section:   mk.Location.Chapter,
-				Location:  mk.Location,
-				Data:      mk.Data,
-				UserNotes: mk.UserNotes,
+				Type:     mk.Type,
+				Title:    mk.Section,
+				Author:   bk.Author,
+				Section:  mk.Location.Chapter,
+				Location: mk.Location,
+				Data:     mk.Data,
+				UserNote: mk.UserNote,
 			})
 		}
 	}
@@ -241,7 +241,7 @@ func handleNote(tokenizer *html.Tokenizer, book *model.Book, section string) {
 
 	handleNextText(tokenizer, func(tokenizer *html.Tokenizer) {
 		mk.Data = book.Marks[len(book.Marks)-1].Data
-		mk.UserNotes = string(tokenizer.Raw())
+		mk.UserNote = string(tokenizer.Raw())
 	})
 	book.Marks = append(book.Marks, mk)
 }

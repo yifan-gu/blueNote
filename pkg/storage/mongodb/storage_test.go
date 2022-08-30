@@ -29,9 +29,9 @@ func TestConstructUpdateFromMark(t *testing.T) {
 			Page:     &page10,
 			Location: &loc100,
 		},
-		Data:      "Data D",
-		UserNotes: "Notes N",
-		Tags:      []string{"Tag D", "Tag C", "Tag B", "Tag A"},
+		Data:     "Data D",
+		UserNote: "Note N",
+		Tags:     []string{"Tag D", "Tag C", "Tag B", "Tag A"},
 	}
 	tests := []struct {
 		original *model.Mark
@@ -90,8 +90,8 @@ func TestConstructUpdateFromMark(t *testing.T) {
 		},
 		{
 			original: &originalMark1,
-			update:   &model.Mark{UserNotes: "Notes O"},
-			result:   bson.M{"$set": bson.M{"notes": "Notes O", "lastModifiedAt": int64(9)}},
+			update:   &model.Mark{UserNote: "Note O"},
+			result:   bson.M{"$set": bson.M{"note": "Note O", "lastModifiedAt": int64(9)}},
 		},
 		{
 			original: &originalMark1,
@@ -110,9 +110,9 @@ func TestConstructUpdateFromMark(t *testing.T) {
 					Page:     &page42,
 					Location: &loc420,
 				},
-				Data:      "Data A",
-				UserNotes: "Notes O",
-				Tags:      []string{"tag d", "tag c", "tag b", "tag a"}},
+				Data:     "Data A",
+				UserNote: "Note O",
+				Tags:     []string{"tag d", "tag c", "tag b", "tag a"}},
 			result: bson.M{"$set": bson.M{
 				"type":              "NOTE",
 				"title":             "Title I",
@@ -122,7 +122,7 @@ func TestConstructUpdateFromMark(t *testing.T) {
 				"location.page":     &page42,
 				"location.location": &loc420,
 				"data":              "Data A",
-				"notes":             "Notes O",
+				"note":              "Note O",
 				"tags":              []string{"tag a", "tag b", "tag c", "tag d"},
 				"lastModifiedAt":    int64(11),
 			}},
@@ -139,9 +139,9 @@ func TestConstructUpdateFromMark(t *testing.T) {
 					Page:     &page42,
 					Location: &loc420,
 				},
-				Data:      "Data A",
-				UserNotes: "Notes O",
-				Tags:      []string{"tag d", "tag c", "tag b", "tag a"}},
+				Data:     "Data A",
+				UserNote: "Note O",
+				Tags:     []string{"tag d", "tag c", "tag b", "tag a"}},
 			result: bson.M{"$set": bson.M{
 				"type":              "NOTE",
 				"title":             "Title I",
@@ -151,7 +151,7 @@ func TestConstructUpdateFromMark(t *testing.T) {
 				"location.page":     &page42,
 				"location.location": &loc420,
 				"data":              "Data A",
-				"notes":             "Notes O",
+				"note":              "Note O",
 				"tags":              []string{"tag a", "tag b", "tag c", "tag d"},
 				"lastModifiedAt":    int64(12),
 			}},

@@ -28,7 +28,7 @@ type Mark struct {
 	Section        string    `json:"section,omitempty"`
 	Location       *Location `json:"location,omitempty"`
 	Data           string    `json:"data,omitempty"`
-	UserNotes      string    `json:"notes,omitempty"`
+	UserNote       string    `json:"note,omitempty"`
 	Tags           []string  `json:"tags,omitempty"`
 	CreatedAt      *int64    `json:"createdAt,omitempty"`
 	LastModifiedAt *int64    `json:"lastModifiedAt,omitempty"`

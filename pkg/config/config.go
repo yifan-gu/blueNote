@@ -36,3 +36,7 @@ type StorageConfig struct {
 
 	Filter string
 }
+
+type ServerConfig struct {
+	ListenAddr string
+}
