@@ -2,6 +2,7 @@
 Copyright © 2022 Yifan Gu <guyifan1121@gmail.com>
 
 */
+
 package cmd
 
 import (
@@ -46,5 +47,7 @@ func init() {
 	storageCmd.PersistentFlags().StringVar(&storageConfig.Filter, "filter", "", "the filters for the storage CRUD operation, expecting a json format (e.g. \"{\"_id\":\"<id>\"}\")")
 
 	registerStorages()
+
 	storage.LoadConfigs(storageCmd)
+	storage.LoadConfigs(serverCmd)
 }

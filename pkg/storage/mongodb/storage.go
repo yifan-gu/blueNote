@@ -38,7 +38,7 @@ type PersistentMark struct {
 	Section        string             `bson:"section,omitempty"`
 	Location       *Location          `bson:"location,omitempty"`
 	Data           string             `bson:"data,omitempty"`
-	UserNotes      string             `bson:"notes,omitempty"`
+	UserNote       string             `bson:"note,omitempty"`
 	Tags           []string           `bson:"tags,omitempty"`
 	CreatedAt      *int64             `bson:"createdAt"`
 	LastModifiedAt *int64             `bson:"lastModifiedAt"`
@@ -219,10 +219,26 @@ func parseFilter(filter interface{}) (bson.M, error) {
 	case string:
 		return parseFilterString(val)
 	case bson.M:
-		return val, nil
+		return parseFilterBSONM(val)
 	default:
 		return nil, errors.New(fmt.Sprintf("Invalid filter type %T, expecting \"string\" or \"bsons.M\"", val))
 	}
+}
+
+func parseFilterBSONM(filter bson.M) (bson.M, error) {
+	ret := filter
+	id := ret["_id"]
+	if id != nil {
+		hexID, ok := id.(string)
+		if ok {
+			objID, err := primitive.ObjectIDFromHex(hexID)
+			if err != nil {
+				return nil, errors.Wrap(err, "")
+			}
+			ret["_id"] = objID
+		}
+	}
+	return ret, nil
 }
 
 func parseFilterString(filter string) (bson.M, error) {
@@ -259,7 +275,7 @@ func MarkToPersistentMark(mark *model.Mark) (*PersistentMark, error) {
 			Location: mark.Location.Location,
 		},
 		Data:           mark.Data,
-		UserNotes:      mark.UserNotes,
+		UserNote:       mark.UserNote,
 		Tags:           mark.Tags,
 		CreatedAt:      mark.CreatedAt,
 		LastModifiedAt: mark.LastModifiedAt,
@@ -285,7 +301,7 @@ func PersistentMarkToMark(pm *PersistentMark) *model.Mark {
 		Author:         pm.Author,
 		Section:        pm.Section,
 		Data:           pm.Data,
-		UserNotes:      pm.UserNotes,
+		UserNote:       pm.UserNote,
 		Tags:           pm.Tags,
 		CreatedAt:      pm.CreatedAt,
 		LastModifiedAt: pm.LastModifiedAt,
@@ -338,8 +354,8 @@ func constructUpdateFromMark(original, update *model.Mark) bson.M {
 		b["data"] = update.Data
 		modified = true
 	}
-	if update.UserNotes != "" && update.UserNotes != original.UserNotes {
-		b["notes"] = update.UserNotes
+	if update.UserNote != "" && update.UserNote != original.UserNote {
+		b["note"] = update.UserNote
 		modified = true
 	}
 	if update.Tags != nil {

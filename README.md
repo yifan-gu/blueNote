@@ -68,8 +68,12 @@ Server Backend:
 - [ ] <s>Recompute digest</s>
 - [x] Limit on return marks
 - [x] Timestamp(created, last modified)
-- [ ] Server REST API
-- [ ] Graphql API?
+- [ ] Server REST API?
+- [x] Graphql API READ
+- [ ] Graphql API Create
+- [ ] Graphql API Update
+- [ ] Graphql API Delete
+- [ ] Handle Graphql null fields
 
 App:
 - [ ] Search by tags, keywords, book, author
