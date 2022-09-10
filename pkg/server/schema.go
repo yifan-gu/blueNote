@@ -72,6 +72,23 @@ var int64Type = graphql.NewScalar(graphql.ScalarConfig{
 	},
 })
 
+var locationInputType = graphql.NewInputObject(
+	graphql.InputObjectConfig{
+		Name: "LocationInput",
+		Fields: graphql.InputObjectConfigFieldMap{
+			"chapter": &graphql.InputObjectFieldConfig{
+				Type: graphql.String,
+			},
+			"page": &graphql.InputObjectFieldConfig{
+				Type: graphql.Int,
+			},
+			"location": &graphql.InputObjectFieldConfig{
+				Type: graphql.Int,
+			},
+		},
+	},
+)
+
 var locationType = graphql.NewObject(
 	graphql.ObjectConfig{
 		Name: "Location",
@@ -162,6 +179,9 @@ func (s *server) graphqlQueryType() *graphql.Object {
 						"tags": &graphql.ArgumentConfig{
 							Type: graphql.NewList(graphql.String),
 						},
+						"location": &graphql.ArgumentConfig{
+							Type: locationInputType,
+						},
 						"createdBefore": &graphql.ArgumentConfig{
 							Type: graphql.Int,
 						},
@@ -185,10 +205,103 @@ func (s *server) graphqlQueryType() *graphql.Object {
 	)
 }
 
+func (s *server) graphqlMutationType() *graphql.Object {
+	return graphql.NewObject(
+		graphql.ObjectConfig{
+			Name: "Mutation",
+			Fields: graphql.Fields{
+				// Create a new mark
+				// http://localhost:11212/marks?query=mutation+_{createOne(type:"",title:"",author:"",data:"",note:"",tags:[]){type,title,author,data,note,tags}}
+				"createOne": &graphql.Field{
+					Type:        markType,
+					Description: "Create a new mark",
+					Args: graphql.FieldConfigArgument{
+						"type": &graphql.ArgumentConfig{
+							Type: graphql.NewNonNull(graphql.String), // TODO(yifan): Use Enum?
+						},
+						"title": &graphql.ArgumentConfig{
+							Type: graphql.NewNonNull(graphql.String),
+						},
+						"author": &graphql.ArgumentConfig{
+							Type: graphql.NewNonNull(graphql.String),
+						},
+						"section": &graphql.ArgumentConfig{
+							Type: graphql.String,
+						},
+						"location": &graphql.ArgumentConfig{
+							Type: locationInputType,
+						},
+						"data": &graphql.ArgumentConfig{
+							Type: graphql.String,
+						},
+						"note": &graphql.ArgumentConfig{
+							Type: graphql.String,
+						},
+						"tags": &graphql.ArgumentConfig{
+							Type: graphql.NewList(graphql.String),
+						},
+					},
+					Resolve: s.createOneMark,
+				},
+				// Update a mark by id
+				// http://localhost:11212/marks?query=mutation+_{updateOne(id:1,type:"",title:"",author:"",data:"",note:"",tags:[]){type,title,author,data,note,tags}}
+				"updateOne": &graphql.Field{
+					Type:        markType,
+					Description: "Update a mark by its ID",
+					Args: graphql.FieldConfigArgument{
+						"id": &graphql.ArgumentConfig{
+							Type: graphql.NewNonNull(graphql.String),
+						},
+						"type": &graphql.ArgumentConfig{
+							Type: graphql.String, // TODO(yifan): Use Enum?
+						},
+						"title": &graphql.ArgumentConfig{
+							Type: graphql.String,
+						},
+						"author": &graphql.ArgumentConfig{
+							Type: graphql.String,
+						},
+						"section": &graphql.ArgumentConfig{
+							Type: graphql.String,
+						},
+						"location": &graphql.ArgumentConfig{
+							Type: locationInputType,
+						},
+						"data": &graphql.ArgumentConfig{
+							Type: graphql.String,
+						},
+						"note": &graphql.ArgumentConfig{
+							Type: graphql.String,
+						},
+						"tags": &graphql.ArgumentConfig{
+							Type: graphql.NewList(graphql.String),
+						},
+					},
+					Resolve: s.updateOneMarkByID,
+				},
+				// Delete a mark by id
+				// http://localhost:11212/marks?query=mutation+_{delete(id:1,){type,title,author,data,note,tags}}
+				"deleteOne": &graphql.Field{
+					Type:        markType,
+					Description: "Delete a mark by its ID",
+					Args: graphql.FieldConfigArgument{
+						"id": &graphql.ArgumentConfig{
+							Type: graphql.NewNonNull(graphql.String),
+						},
+					},
+					Resolve: s.deleteOneMarkByID,
+				},
+			},
+		},
+	)
+
+}
+
 func (s *server) graphqlSchema() graphql.Schema {
 	schema, err := graphql.NewSchema(
 		graphql.SchemaConfig{
-			Query: s.graphqlQueryType(),
+			Query:    s.graphqlQueryType(),
+			Mutation: s.graphqlMutationType(),
 		},
 	)
 	if err != nil {

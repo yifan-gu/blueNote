@@ -5,11 +5,23 @@ Copyright © 2022 Yifan Gu <guyifan1121@gmail.com>
 
 package model
 
+import (
+	"errors"
+	"fmt"
+)
+
 const (
 	// MarkTypeHighlight is a highlight marking.
 	MarkTypeHighlight = "HIGHLIGHT"
 	// MarkTypeNote is a note marking.
 	MarkTypeNote = "NOTE"
+)
+
+var (
+	typeMaps = map[string]struct{}{
+		MarkTypeHighlight: struct{}{},
+		MarkTypeNote:      struct{}{},
+	}
 )
 
 // Book defines the details of a Book object, which also contains a list of marks.
@@ -39,4 +51,19 @@ type Location struct {
 	Chapter  string `json:"chapter,omitempty"`
 	Page     *int   `json:"page,omitempty"`
 	Location *int   `json:"location,omitempty"`
+}
+
+func isSupportedType(typ string) bool {
+	_, ok := typeMaps[typ]
+	return ok
+}
+
+func ValidateMark(m *Mark) error {
+	if !isSupportedType(m.Type) {
+		return errors.New(fmt.Sprintf("Type %v is not supported", m.Type))
+	}
+	if m.Data == "" && m.UserNote == "" {
+		return errors.New("Expect 'data' or 'note' to be set")
+	}
+	return nil
 }

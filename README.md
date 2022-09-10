@@ -60,6 +60,7 @@ Parser/Exporter:
 - [x] List parsers and exporters
 - [x] MongoDB exporter
 - [x] JSON parser
+- [ ] One click export from Kindle app
 
 Server Backend:
 - [x] Database storage
@@ -70,10 +71,11 @@ Server Backend:
 - [x] Timestamp(created, last modified)
 - [ ] Server REST API?
 - [x] Graphql API READ
-- [ ] Graphql API Create
-- [ ] Graphql API Update
-- [ ] Graphql API Delete
-- [ ] Handle Graphql null fields
+- [x] Graphql API Create
+- [x] Graphql API Update
+- [x] Graphql API Delete
+- [ ] Handle Graphql null fields?
+- [ ] Graphql API tests, mocked storage
 
 App:
 - [ ] Search by tags, keywords, book, author

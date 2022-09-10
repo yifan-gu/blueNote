@@ -171,10 +171,10 @@ func (s *MongoDBStorage) UpdateOneMark(ctx context.Context, id string, update *m
 	if err != nil {
 		return errors.Wrap(err, "")
 	}
-	if len(marks) != 0 {
+	if len(marks) != 1 {
 		return errors.New(fmt.Sprintf("Expecting 1 mark for id %q, but saw %v", id, len(marks)))
 	}
-	if _, err := s.coll.UpdateByID(ctx, id, constructUpdateFromMark(marks[0], update)); err != nil {
+	if _, err := s.coll.UpdateByID(ctx, objectID, constructUpdateFromMark(marks[0], update)); err != nil {
 		return errors.Wrap(err, "")
 	}
 	return nil
@@ -264,6 +264,9 @@ func parseFilterString(filter string) (bson.M, error) {
 
 // MarkToPersistentMark converts a Mark to a PersistentMark
 func MarkToPersistentMark(mark *model.Mark) (*PersistentMark, error) {
+	if err := model.ValidateMark(mark); err != nil {
+		return nil, err
+	}
 	ret := &PersistentMark{
 		Type:    mark.Type,
 		Title:   mark.Title,
@@ -369,5 +372,6 @@ func constructUpdateFromMark(original, update *model.Mark) bson.M {
 	if modified {
 		b["lastModifiedAt"] = util.NowUnixMilli()
 	}
+
 	return bson.M{"$set": b}
 }
