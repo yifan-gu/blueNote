@@ -44,6 +44,8 @@ git clone git@github.com:yifan-gu/blueNote.git && go build
 
 
 ## TODO
+Documentation
+- [ ] Update README to reflect the json/mongodb based usage
 
 Emacs org roam related:
 - [ ] <s>[Dropped] Roam module (fix bug)</s>
@@ -78,6 +80,7 @@ Server Backend:
 - [ ] Graphql API tests, mocked storage
 
 App:
+- [ ] Create DB scheme for users
 - [ ] Search by tags, keywords, book, author
 - [ ] Show random notes/highlights every time
 - [ ] Show connected notes
