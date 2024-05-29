@@ -15,17 +15,28 @@ git clone git@github.com:yifan-gu/blueNote.git && go build
 #### Export notes as html using the Kindle App
 ![Export Notes From Kindle App](screenshots/export-notes-from-kindle-app.png)
 
-#### Convert notes to org-roam files
+
+#### Convert notes to JSON and display them in the console
+```
+./blueNote convert -i kindle-html -o json --json.pretty examples/kindle_html_single_book_example.html
+```
+
+#### Convert notes and store them into MongoDB
+```
+./blueNote convert -i kindle-html -o mongodb examples/kindle_html_single_book_example.html
+```
+
+#### Convert notes to org-roam files and save to the current dir
 ```
 ./blueNote convert -i kindle-html -o org-roam examples/kindle_html_single_book_example.html ./
 ```
 
 #### Add `-s` if the book is a collection of multiple books
 ```
-./blueNote convert -i kindle-html -o org-roam -s examples/kindle_html_collection_example.html ./
+./blueNote convert -i kindle-html -o json --json.pretty -s examples/kindle_html_collection_example.html
 ```
 
-#### Browse and edit the notes with tags
+#### Browse and edit the notes with tags with Emacs Org
 ![View and Edit Notes in Emacs Org-roam](screenshots/view-notes-with-emacs-org-roam.png)
 
 #### Remember to run `M-x org-roam-db-sync` to sync the org-roam database
