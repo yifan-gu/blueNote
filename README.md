@@ -75,6 +75,7 @@ Parser/Exporter:
 - [x] JSON parser
 - [ ] One click export from Kindle app
 - [ ] Change parser/exporter type from string to safe type
+- [ ] My Clippings.txt parser
 
 Server Backend:
 - [x] Database storage
