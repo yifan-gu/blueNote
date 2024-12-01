@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 
 	"github.com/graphql-go/graphql"
@@ -30,14 +31,37 @@ func NewServer(config *config.ServerConfig, store storage.Storage) Server {
 
 func (s *server) Run() {
 	schema = s.graphqlSchema()
-	http.HandleFunc("/marks", handleGraphqlMarks)
+	http.HandleFunc("/graphql", handleGraphqlMarks)
 	util.Logf("Server is running on %v\n", s.config.ListenAddr)
 	http.ListenAndServe(s.config.ListenAddr, nil)
 
 }
 
 func handleGraphqlMarks(w http.ResponseWriter, r *http.Request) {
-	result := executeQuery(r.Context(), r.URL.Query().Get("query"))
+	// Ensure the request method is POST
+	if r.Method != http.MethodPost {
+		http.Error(w, "Only POST requests are allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Read the POST body
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Failed to read request body", http.StatusInternalServerError)
+		return
+	}
+	defer r.Body.Close()
+
+	// Parse the body as JSON
+	var requestData map[string]interface{}
+	if err := json.Unmarshal(body, &requestData); err != nil {
+		http.Error(w, "Invalid JSON in request body", http.StatusBadRequest)
+		return
+	}
+
+	util.Logf("Received request from %v, request is %v\n", r.Host, requestData)
+
+	result := executeQuery(r.Context(), requestData["query"].(string))
 	json.NewEncoder(w).Encode(result)
 }
 

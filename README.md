@@ -32,11 +32,8 @@ This tool supports both **HTML highlights** exported via the Kindle App and the 
 ./blueNote convert -i kindle-my-clippings -o json --json.pretty examples/My\ Clippings.txt
 ```
 
-### Export notes as html using the Kindle App
-![Export Notes From Kindle App](screenshots/export-notes-from-kindle-app.png)
-
-
-### Convert notes to JSON and display them in the console
+### Convert `Kindle HTML` notes to JSON and display them in the console
+(click [here](Documents/HOW_TO_EXPORT_KINDLE_HTML_HIGHLIGHTS.md) to see how to export the kindle HTML notes via Kindle App)
 ```
 ./blueNote convert -i kindle-html -o json --json.pretty examples/kindle_html_single_book_example.html
 ```
@@ -46,14 +43,47 @@ This tool supports both **HTML highlights** exported via the Kindle App and the 
 ./blueNote convert -i kindle-html -o mongodb examples/kindle_html_single_book_example.html
 ```
 
+<!-- deprecated
 ### Convert notes to org-roam files and save to the current dir
 ```
 ./blueNote convert -i kindle-html -o org-roam examples/kindle_html_single_book_example.html ./
 ```
+-->
 
 ### Add `-s` if the book is a collection of multiple books
 ```
 ./blueNote convert -i kindle-html -o json --json.pretty -s examples/kindle_html_collection_example.html
+```
+
+### Run as an http server that serves data from the MongoDB via GraphQL enpoints
+
+``` 
+./blueNote server
+```
+
+### Query the highlights using the GraphQL API
+
+```
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"query": "query { marks(author: \"Maugham\") { type title author data note tags createdAt lastModifiedAt } }"}' \
+  http://localhost:11212/graphql 2>/dev/null | jq .
+{
+  "data": {
+    "marks": [
+      {
+        "author": "Maugham, W. Somerset",
+        "createdAt": 1733038917438,
+        "data": "trouble, much resented the churchwarden's managing ways. He really seemed to look upon himself as the most important person in the parish. Mr. Carey constantly told his wife that if Josiah Graves did not take care he would give him a good rap over the knuckles one day; but Mrs. Carey advised him to bear with Josiah Graves: he meant well, and it was not",
+        "lastModifiedAt": 1733038917438,
+        "note": "",
+        "tags": [],
+        "title": "Of Human Bondage",
+        "type": "HIGHLIGHT"
+      }
+    ]
+  }
+}
 ```
 
 
@@ -103,6 +133,7 @@ Remember to run `M-x org-roam-db-sync` to sync the org-roam database.
 - [x] `My Clippings.txt` parser.
 - [ ] Diff the previous processed `My Clippings.txt`
 - [ ] Support multiple authors.
+- [ ] Add progress indicator
 
 ### Server Backend
 - [x] Database storage.
