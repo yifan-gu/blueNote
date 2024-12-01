@@ -159,6 +159,9 @@ func (p *KindleMyClippingsParser) Parse(inputPath string) ([]*model.Book, error)
 	// Final summary
 	fmt.Fprintln(os.Stderr) // Add a newline after the progress output
 	fmt.Fprintf(os.Stderr, "Finished processing: %d lines parsed, %d books deduplicated, %d marks processed\n", lineCount, totalBooks, entryCount)
+
+	model.SortBooksByTitle(books)
+
 	return books, nil
 }
 

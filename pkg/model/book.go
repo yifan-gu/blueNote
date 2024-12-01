@@ -78,26 +78,10 @@ func ValidateMark(m *Mark) error {
 	return nil
 }
 
-// ByTitle is a type that implements sort.Interface for []*Book based on the Title field.
-type ByTitle []*Book
-
-// Len is the number of elements in the collection.
-func (b ByTitle) Len() int {
-	return len(b)
-}
-
-// Less reports whether the element at index i should sort before the element at index j.
-func (b ByTitle) Less(i, j int) bool {
-	// Compare titles case-insensitively
-	return strings.ToLower(b[i].Title) < strings.ToLower(b[j].Title)
-}
-
-// Swap swaps the elements at indexes i and j.
-func (b ByTitle) Swap(i, j int) {
-	b[i], b[j] = b[j], b[i]
-}
-
-// SortBooksByTitle sorts a slice of books by title.
 func SortBooksByTitle(books []*Book) {
-	sort.Sort(ByTitle(books))
+	sort.Slice(books, func(i, j int) bool {
+		titleA := strings.ToLower(books[i].Title)
+		titleB := strings.ToLower(books[j].Title)
+		return titleA < titleB
+	})
 }
