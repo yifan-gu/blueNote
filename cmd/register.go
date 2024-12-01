@@ -10,6 +10,7 @@ import (
 	"github.com/yifan-gu/blueNote/pkg/parser"
 	jsonparser "github.com/yifan-gu/blueNote/pkg/parser/json"
 	"github.com/yifan-gu/blueNote/pkg/parser/kindlehtml"
+	"github.com/yifan-gu/blueNote/pkg/parser/kindlemyclippings"
 	"github.com/yifan-gu/blueNote/pkg/storage"
 	mongodbStore "github.com/yifan-gu/blueNote/pkg/storage/mongodb"
 	"github.com/yifan-gu/blueNote/pkg/util"
@@ -18,6 +19,7 @@ import (
 func registerParsers() {
 	parser.RegisterParser(&kindlehtml.KindleHTMLParser{})
 	parser.RegisterParser(&jsonparser.JSONParser{})
+	parser.RegisterParser(&kindlemyclippings.KindleMyClippingsParser{})
 }
 
 func registerExporters() {

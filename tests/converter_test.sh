@@ -32,5 +32,11 @@ output="$(go run ./...  convert -ijson --json.pretty -s -ojson \
     --json.title="The Sun Also Rises" \
     "${ROOT_DIR}/tests/single_book_output.json")"
 echo "${output}" | diff "${ROOT_DIR}/tests/single_book_output_author_title.json" -
+echo "======================"
 
-echo "Passed!"
+echo "Test parsing 'My Clippings.txt'"
+output="$(go run ./... convert -i kindle-my-clippings --json.pretty -ojson \
+    "${ROOT_DIR}/examples/My Clippings.txt")"
+echo "${output}" | diff "${ROOT_DIR}/tests/my_clippings_output.json" -
+
+echo "PASSED!"
