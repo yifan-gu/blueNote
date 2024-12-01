@@ -131,9 +131,11 @@ Remember to run `M-x org-roam-db-sync` to sync the org-roam database.
 - [ ] One-click export from Kindle app.
 - [ ] Change parser/exporter type from string to safe type.
 - [x] `My Clippings.txt` parser.
-- [ ] Diff the previous processed `My Clippings.txt`
+- [ ] Diff the previous processed `My Clippings.txt` so don't parse the whole file again.
 - [ ] Support multiple authors.
-- [ ] Add progress indicator
+- [x] Add progress indicator.
+- [ ] Difference between createdAt and when notes are added to the database.
+- [ ] Figure out the difference in length between json and loaded mongodb json.
 
 ### Server Backend
 - [x] Database storage.

@@ -29,39 +29,71 @@ func (p *KindleMyClippingsParser) LoadConfigs(cmd *cobra.Command) {
 	cmd.Flags().Float64Var(&p.minSimilarity, "min-similarity", 0.8, "Minimum similarity percentage (0-1) to consider a highlight as duplicate")
 }
 
-// Parse processes the MyClippings.txt file and returns a list of Books with deduplicated Marks.
 func (p *KindleMyClippingsParser) Parse(inputPath string) ([]*model.Book, error) {
+	// Open the file
 	file, err := os.Open(inputPath)
 	defer file.Close()
 	if err != nil {
-		return nil, errors.Wrap(err, "")
+		return nil, errors.Wrap(err, "failed to open input file")
+	}
+
+	// Count total lines in the file to calculate parsing progress
+	totalLines, err := countLines(file)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to count lines in input file")
+	}
+	// Reset the file cursor to the beginning after counting lines
+	if _, err := file.Seek(0, 0); err != nil {
+		return nil, errors.Wrap(err, "failed to reset file cursor")
 	}
 
 	var books []*model.Book
 	markListMap := make(map[string][]*model.Mark) // Maps book title -> list of marks
 
 	scanner := bufio.NewScanner(file)
+	lineCount := 0  // Total number of lines processed
+	entryCount := 0 // Total number of marks (entries)
+
+	// Function to print parsing progress
+	printParsingProgress := func() {
+		if lineCount%500 == 0 || lineCount == totalLines {
+			progress := (float64(lineCount) / float64(totalLines)) * 100
+			fmt.Fprintf(os.Stderr, "\rParsing Progress: %.2f%% (%d/%d lines processed, %d entries parsed)", progress, lineCount, totalLines, entryCount)
+		}
+	}
+
+	// Parsing phase
 	for scanner.Scan() {
+		lineCount++
+		printParsingProgress()
+
 		// Extract book details
 		title, author, err := extractTitleAndAuthor(stripLeadingBOM(scanner.Text()))
 		if err != nil {
-			return nil, errors.Wrap(err, "")
+			return nil, errors.Wrap(err, fmt.Sprintf("error parsing title and author at line %d", lineCount))
 		}
 
 		// Parse metadata
 		if !scanner.Scan() {
-			return nil, fmt.Errorf("unexpected EOF, expecting metadata")
+			return nil, fmt.Errorf("unexpected EOF at line %d, expecting metadata", lineCount)
 		}
+		lineCount++
+		printParsingProgress()
 		meta := scanner.Text()
 		markType, location, createdAt, err := extractMeta(meta)
 		if err != nil {
-			return nil, errors.Wrap(err, "")
+			return nil, errors.Wrap(err, fmt.Sprintf("error parsing metadata at line %d", lineCount))
 		}
 
 		scanner.Scan() // Skip the empty line before the actual text.
+		lineCount++
+		printParsingProgress()
 
 		var text []string
 		for scanner.Scan() {
+			lineCount++
+			printParsingProgress()
+
 			line := scanner.Text()
 			if line == "==========" {
 				break
@@ -71,7 +103,7 @@ func (p *KindleMyClippingsParser) Parse(inputPath string) ([]*model.Book, error)
 
 		// Parse data or note
 		if text == nil { // Empty notes, skip
-			return nil, nil
+			continue
 		}
 
 		// Create the mark
@@ -99,42 +131,42 @@ func (p *KindleMyClippingsParser) Parse(inputPath string) ([]*model.Book, error)
 			markListMap[title] = []*model.Mark{}
 		}
 		markListMap[title] = append(markListMap[title], mark)
+
+		entryCount++
 	}
 
-	// Deduplicate marks for each book
+	// Deduplication phase
+	totalBooks := len(markListMap)
+	processedBooks := 0
+
 	for title, marks := range markListMap {
-		deduplicatedMarks := deduplicateMarks(marks, p.minSimilarity) // Use the configured threshold
+		processedBooks++
+		fmt.Fprintf(os.Stderr, "\nStarting deduplication for book: %s (%d marks)\n", title, len(marks))
+
+		deduplicatedMarks := deduplicateMarksWithProgress(marks, p.minSimilarity) // Deduplication with progress inside
 		book := &model.Book{
 			Title:  title,
 			Author: marks[0].Author,
 			Marks:  deduplicatedMarks,
 		}
 		books = append(books, book)
+
+		// Print progress across books
+		bookProgress := (float64(processedBooks) / float64(totalBooks)) * 100
+		fmt.Fprintf(os.Stderr, "\rTotal Deduplication Progress: %.2f%% (%d/%d books processed)", bookProgress, processedBooks, totalBooks)
 	}
 
-	if err := scanner.Err(); err != nil {
-		return nil, errors.Wrap(err, "")
-	}
-
-	model.SortBooksByTitle(books)
-
+	// Final summary
+	fmt.Fprintln(os.Stderr) // Add a newline after the progress output
+	fmt.Fprintf(os.Stderr, "Finished processing: %d lines parsed, %d books deduplicated, %d marks processed\n", lineCount, totalBooks, entryCount)
 	return books, nil
 }
 
-func stripLeadingBOM(s string) string {
-	runes := []rune(s)
-	start := 0
-	for start < len(runes) && runes[start] == '\uFEFF' {
-		start++
-	}
-	return string(runes[start:])
-}
-
-// Deduplicate marks by comparing similarity of content using a minimum common words threshold
-func deduplicateMarks(marks []*model.Mark, minSimilarity float64) []*model.Mark {
+func deduplicateMarksWithProgress(marks []*model.Mark, minSimilarity float64) []*model.Mark {
 	var deduplicated []*model.Mark
+	totalMarks := len(marks)
 
-	for _, mark := range marks {
+	for index, mark := range marks {
 		duplicateFound := false
 		for i, dedupMark := range deduplicated {
 			if hasMinCommonWords(dedupMark.Data, mark.Data, minSimilarity) {
@@ -149,9 +181,38 @@ func deduplicateMarks(marks []*model.Mark, minSimilarity float64) []*model.Mark 
 		if !duplicateFound {
 			deduplicated = append(deduplicated, mark)
 		}
+
+		// Print deduplication progress for current book every 100 marks
+		if (index+1)%100 == 0 || index+1 == totalMarks {
+			progress := (float64(index+1) / float64(totalMarks)) * 100
+			fmt.Fprintf(os.Stderr, "\rDeduplication Progress for current book: %.2f%% (%d/%d marks processed)", progress, index+1, totalMarks)
+		}
 	}
 
+	// Print a new line after finishing the current book
+	fmt.Fprintln(os.Stderr)
 	return deduplicated
+}
+
+func countLines(file *os.File) (int, error) {
+	scanner := bufio.NewScanner(file)
+	lineCount := 0
+	for scanner.Scan() {
+		lineCount++
+	}
+	if err := scanner.Err(); err != nil {
+		return 0, err
+	}
+	return lineCount, nil
+}
+
+func stripLeadingBOM(s string) string {
+	runes := []rune(s)
+	start := 0
+	for start < len(runes) && runes[start] == '\uFEFF' {
+		start++
+	}
+	return string(runes[start:])
 }
 
 // Check if two strings share a longest common substring whose percentage of similarity meets the threshold
